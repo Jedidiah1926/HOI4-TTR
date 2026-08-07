@@ -6,9 +6,9 @@
       --tno-neon-dim: rgba(183, 77, 255, .3);
       --tno-text: #efe0ff;
       --tno-border: #4a2a7a;
-      --tno-gold: #ff9a4d;
+      --tno-gold: #ffd700;
       --vote-yea: #b968ff;
-      --tno-future: #ff3ec4;
+      --tno-future: #ff4444;
       --rd-gap: clamp(10px, 1.25vw, 18px);
       --edge-pad: clamp(14px, 1.8vw, 26px);
     }
@@ -198,7 +198,7 @@
       line-height: 1;
       letter-spacing: 3px;
       text-align: left;
-      text-shadow: 0 0 10px rgba(255,154,77,.5);
+      text-shadow: 0 0 10px rgba(255,215,0,.55);
       flex: 0 0 auto;
     }
 
@@ -275,7 +275,7 @@
 
     .rd-card.future {
       --card-color: var(--tno-future);
-      --card-bg-hover: #24101c;
+      --card-bg-hover: #241010;
     }
 
     .rd-card:hover {
