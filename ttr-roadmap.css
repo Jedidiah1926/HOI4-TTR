@@ -6,8 +6,8 @@
       --tno-neon-dim: rgba(183, 77, 255, .3);
       --tno-text: #efe0ff;
       --tno-border: #4a2a7a;
-      --tno-gold: #ffd700;
-      --vote-yea: #00ff88;
+      --tno-gold: #ffb84d;
+      --vote-yea: #7c9bff;
       --rd-gap: clamp(10px, 1.25vw, 18px);
       --edge-pad: clamp(14px, 1.8vw, 26px);
     }
@@ -197,7 +197,7 @@
       line-height: 1;
       letter-spacing: 3px;
       text-align: left;
-      text-shadow: 0 0 10px rgba(255,215,0,.55);
+      text-shadow: 0 0 10px rgba(255,184,77,.5);
       flex: 0 0 auto;
     }
 
