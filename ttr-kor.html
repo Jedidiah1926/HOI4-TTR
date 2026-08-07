@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>THE TOOL RISES — HOI4 Content Maker</title>
+<style>
+@import url('//cdn.jsdelivr.net/gh/neodgm/neodgm-webfont@1.601/neodgm/style.css');
+@import url('//cdn.jsdelivr.net/gh/neodgm/neodgm-webfont@1.601/neodgm_code/style.css');
+
+:root{
+  --void:#050310;
+  --panel:#130a24;
+  --panel-2:#1c1036;
+  --panel-3:#271745;
+  --line:#4a2a7a;
+  --line-soft:#2c1a4e;
+  --gold:#b74dff;
+  --gold-hi:#e2a9ff;
+  --gold-dim:#7233ad;
+  --red:#ff3ec4;
+  --red-hi:#ff8adf;
+  --blue:#7c5cff;
+  --blue-hi:#a98cff;
+  --ink:#efe0ff;
+  --ink-mid:#ad8fd6;
+  --ink-low:#6d5493;
+  --good:#5fffc8;
+  --glow-purple: 0 0 8px rgba(183,77,255,.65), 0 0 18px rgba(183,77,255,.25);
+  --glow-pink: 0 0 8px rgba(255,62,196,.6), 0 0 16px rgba(255,62,196,.22);
+  --glow-blue: 0 0 8px rgba(124,92,255,.55);
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  background:
+    radial-gradient(ellipse 900px 500px at 18% -8%, rgba(183,77,255,.14), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 100%, rgba(124,92,255,.10), transparent 60%),
+    var(--void);
+  color:var(--ink);
+  font-family:'NeoDunggeunmo','Inter',sans-serif;
+  font-size:13px;
+  overflow:hidden;
+}
+input,textarea,select,button{font-family:inherit;font-size:inherit;color:inherit;}
+button{cursor:pointer;}
+::-webkit-scrollbar{width:9px;height:9px;}
+::-webkit-scrollbar-track{background:var(--panel);}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:0;}
+::-webkit-scrollbar-thumb:hover{background:var(--gold);box-shadow:var(--glow-purple);}
+
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;}
+
+/* ---------- TOPBAR ---------- */
+.topbar{
+  display:flex;align-items:center;gap:18px;
+  height:56px;flex:0 0 56px;
+  padding:0 16px;
+  background:linear-gradient(180deg,#141a24,#10141b);
+  border-bottom:1px solid var(--line);
+  position:relative;
+  z-index:20;
+}
+.topbar::after{
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold-dim) 20%,var(--gold) 50%,var(--gold-dim) 80%,transparent);
+  opacity:.55;
+}
+.brand{display:flex;flex-direction:column;line-height:1;margin-right:8px;}
+.brand .mark{font-family:'NeoDunggeunmo',sans-serif;font-weight:700;font-size:13px;letter-spacing:.09em;color:var(--gold-hi);text-shadow:var(--glow-purple);white-space:nowrap;}
+.brand .sub{font-family:'NeoDunggeunmo Code',monospace;font-size:9px;letter-spacing:.12em;color:var(--ink-low);margin-top:2px;}
+.divider-v{width:1px;height:26px;background:var(--line);}
+
+.icon-btn{
+  position:relative;flex:0 0 auto;
+  background:var(--panel-3);border:1px solid var(--line);
+  color:var(--ink-mid);width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;line-height:1;font-family:inherit;
+}
+.icon-btn:hover{border-color:var(--gold-dim);color:var(--gold-hi);}
+.icon-btn.active{border-color:var(--gold);color:var(--gold-hi);box-shadow:var(--glow-purple);}
+.icon-btn.primary{
+  background:linear-gradient(180deg,var(--gold),#8a2fd4);
+  border-color:var(--gold);box-shadow:var(--glow-purple);
+}
+.icon-btn.primary:hover{filter:brightness(1.12);}
+
+.icon-btn[data-tip]::after,.panel-handle[data-tip]::after{
+  content:attr(data-tip);
+  position:absolute;top:calc(100% + 9px);left:50%;transform:translateX(-50%);
+  background:var(--panel);border:1px solid var(--gold-dim);color:var(--ink);
+  padding:6px 10px;font-size:10px;white-space:nowrap;letter-spacing:.02em;
+  opacity:0;pointer-events:none;transition:opacity .15s;
+  box-shadow:0 4px 14px rgba(0,0,0,.5),0 0 10px rgba(183,77,255,.25);
+  z-index:60;
+}
+.icon-btn[data-tip]::before,.panel-handle[data-tip]::before{
+  content:'';position:absolute;top:calc(100% + 3px);left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-bottom-color:var(--gold-dim);
+  opacity:0;pointer-events:none;transition:opacity .15s;z-index:60;
+}
+.icon-btn[data-tip]:hover::after,.icon-btn[data-tip]:hover::before,
+.panel-handle[data-tip]:hover::after,.panel-handle[data-tip]:hover::before{opacity:1;}
+
+
+
+.tag-field{display:flex;align-items:center;gap:8px;}
+.tag-field label{font-family:'NeoDunggeunmo',sans-serif;font-size:10px;letter-spacing:.14em;color:var(--ink-low);}
+.tag-field input{
+  width:76px;background:var(--void);border:1px solid var(--line);
+  color:var(--gold-hi);padding:6px 8px;font-family:'NeoDunggeunmo Code',monospace;
+  letter-spacing:.08em;text-transform:uppercase;font-size:12px;
+}
+.tag-field input:focus{outline:none;border-color:var(--gold-dim);}
+
+.tabs{display:flex;gap:2px;margin-left:6px;}
+.tab{
+  background:transparent;border:1px solid transparent;
+  padding:9px 16px;font-family:'NeoDunggeunmo',sans-serif;font-size:11px;
+  letter-spacing:.12em;color:var(--ink-low);text-transform:uppercase;
+  border-bottom:2px solid transparent;white-space:nowrap;
+}
+.tab:hover{color:var(--ink);}
+.tab.active{color:var(--gold-hi);border-bottom:2px solid var(--gold);text-shadow:var(--glow-purple);}
+
+.actions{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.btn{
+  background:var(--panel-3);border:1px solid var(--line);
+  color:var(--ink-mid);padding:8px 13px;
+  font-size:11.5px;letter-spacing:.03em;white-space:nowrap;
+  transition:border-color .12s, color .12s;
+}
+.btn:hover{border-color:var(--gold-dim);color:var(--ink);}
+.btn.primary{
+  background:linear-gradient(180deg,var(--gold),#8a2fd4);
+  border-color:var(--gold);color:#0d0318;font-weight:600;
+  box-shadow:var(--glow-purple);
+}
+.btn.primary:hover{filter:brightness(1.12);}
+.btn.ghost{background:transparent;}
+.btn.danger:hover{border-color:var(--red);color:var(--red-hi);box-shadow:var(--glow-pink);}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+.btn:disabled:hover{border-color:var(--line);color:var(--ink-mid);}
+
+/* ---------- WORKSPACE ---------- */
+.workspace{flex:1;position:relative;overflow:hidden;}
+
+.panel-handle{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:16px;height:56px;z-index:40;
+  background:var(--panel-3);border:1px solid var(--gold-dim);
+  color:var(--gold-hi);display:flex;align-items:center;justify-content:center;
+  font-size:13px;line-height:1;cursor:pointer;
+  box-shadow:0 2px 10px rgba(0,0,0,.5);
+  transition:left .25s ease, right .25s ease, margin-left .25s ease, margin-right .25s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.panel-handle:hover{border-color:var(--gold);box-shadow:0 0 10px rgba(183,77,255,.55);}
+.handle-left{left:250px;margin-left:-8px;border-radius:0 5px 5px 0;}
+.handle-left.collapsed{left:14px;margin-left:0;}
+.handle-right{right:320px;margin-right:-8px;border-radius:5px 0 0 5px;}
+.handle-right.collapsed{right:14px;margin-right:0;}
+.view{position:absolute;inset:0;display:none;}
+.view.active{display:flex;}
+
+.panel{background:var(--panel);display:flex;flex-direction:column;min-width:0;}
+.panel-left{
+  width:250px;flex:0 0 auto;border-right:1px solid var(--line);overflow:hidden;
+  transition:width .25s ease, border-color .25s ease;
+}
+.panel-left.collapsed{width:0;border-right-color:transparent;}
+.panel-right{
+  width:320px;flex:0 0 auto;border-left:1px solid var(--line);overflow:hidden;
+  transition:width .25s ease, border-color .25s ease;
+}
+.panel-right.collapsed{width:0;border-left-color:transparent;}
+.panel-mid{flex:1 1 340px;min-width:320px;border-left:1px solid var(--line);}
+.panel-head{
+  font-family:'NeoDunggeunmo',sans-serif;font-size:10.5px;letter-spacing:.16em;
+  color:var(--ink-low);padding:12px 14px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--line-soft);
+}
+.panel-head .mini{
+  background:transparent;border:1px solid var(--line);color:var(--gold-dim);
+  width:20px;height:20px;line-height:1;font-size:14px;display:flex;
+  align-items:center;justify-content:center;
+}
+.panel-head .mini:hover{border-color:var(--gold);color:var(--gold-hi);}
+
+.searchbox{margin:10px 14px 4px;}
+.searchbox input{
+  width:100%;background:var(--void);border:1px solid var(--line);
+  padding:7px 9px;color:var(--ink);
+}
+.searchbox input:focus{outline:none;border-color:var(--gold-dim);}
+
+.list{flex:1;overflow-y:auto;padding:8px 8px 20px;}
+.empty-state{
+  padding:40px 20px;text-align:center;color:var(--ink-low);
+  font-size:12px;line-height:1.6;
+}
+
+/* focus list row */
+.row{
+  display:flex;align-items:center;gap:9px;padding:8px 8px;
+  border:1px solid transparent;margin-bottom:3px;cursor:pointer;
+  border-left:2px solid transparent;
+}
+.row:hover{background:var(--panel-2);}
+.row.selected{background:var(--panel-3);border-left-color:var(--gold);box-shadow:inset 3px 0 8px -4px rgba(183,77,255,.6);}
+.row .swatch{
+  width:22px;height:22px;flex:0 0 22px;background:var(--panel-3);
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--gold-dim);
+}
+.row .rtext{min-width:0;flex:1;}
+.row .rname{font-size:12.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row .rid{font-family:'NeoDunggeunmo Code',monospace;font-size:9.5px;color:var(--ink-low);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row .rbadge{
+  font-family:'NeoDunggeunmo Code',monospace;font-size:9.5px;color:var(--gold-dim);
+  border:1px solid var(--line);padding:2px 5px;flex:0 0 auto;
+}
+.row .rdel{
+  flex:0 0 auto;background:transparent;border:none;color:var(--ink-low);
+  font-size:13px;padding:2px 4px;opacity:0;
+}
+.row:hover .rdel{opacity:1;}
+.row .rdel:hover{color:var(--red-hi);}
+
+/* category tree */
+.cat-block{margin-bottom:8px;}
+.cat-row{display:flex;align-items:center;gap:6px;padding:7px 6px;cursor:pointer;border-left:2px solid transparent;}
+.cat-row:hover{background:var(--panel-2);}
+.cat-row.selected{background:var(--panel-3);border-left-color:var(--gold);box-shadow:inset 3px 0 8px -4px rgba(183,77,255,.6);}
+.cat-row .chev{width:12px;color:var(--ink-low);font-size:10px;}
+.cat-row .cname{flex:1;font-size:12.5px;color:var(--ink);font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cat-row .ccount{font-family:'NeoDunggeunmo Code',monospace;font-size:9.5px;color:var(--gold-dim);border:1px solid var(--line);padding:1px 5px;}
+.cat-row .ccount.hidden-cat{color:var(--ink-low);}
+.cat-row .eye{background:none;border:none;color:var(--ink-low);font-size:12px;padding:2px 4px;}
+.cat-row .eye.off{color:var(--ink-low);opacity:.5;}
+.cat-row .eye:hover{color:var(--gold-hi);}
+.dec-row{padding-left:26px;}
+.dec-row .rname{font-size:12px;}
+
+/* ---------- CANVAS ---------- */
+.canvas-wrap{flex:1;position:relative;background:var(--void);overflow:hidden;cursor:default;}
+.canvas-wrap svg{width:100%;height:100%;display:block;}
+.canvas-hint{
+  position:absolute;left:14px;bottom:12px;
+  font-family:'NeoDunggeunmo Code',monospace;font-size:10px;color:var(--ink-low);
+  background:rgba(10,13,18,.7);padding:6px 10px;border:1px solid var(--line-soft);
+  pointer-events:none;
+}
+.canvas-zoom{
+  position:absolute;right:14px;bottom:12px;display:flex;gap:0;
+  border:1px solid var(--line);background:rgba(10,13,18,.7);
+}
+.canvas-zoom button{background:transparent;border:none;color:var(--ink-mid);width:28px;height:28px;}
+.canvas-zoom button:hover{color:var(--gold-hi);}
+.canvas-zoom span{width:1px;background:var(--line);}
+.canvas-corner{
+  position:absolute;font-family:'NeoDunggeunmo Code',monospace;font-size:9px;color:var(--ink-low);
+  letter-spacing:.1em;pointer-events:none;
+}
+.corner-tl{top:10px;left:10px;}
+.corner-tr{top:10px;right:14px;text-align:right;}
+
+.node-plate{fill:var(--panel-2);stroke:var(--line);stroke-width:1;}
+.node-plate.selected{stroke:var(--gold);stroke-width:1.8;filter:drop-shadow(0 0 6px rgba(183,77,255,.85));}
+.node-plate.hovered{stroke:var(--gold-dim);}
+.node-icon{fill:var(--panel-3);stroke:var(--line-soft);}
+.node-label{font-family:'NeoDunggeunmo',sans-serif;font-size:9.5px;fill:var(--ink);letter-spacing:.01em;}
+.node-cost{font-family:'NeoDunggeunmo Code',monospace;font-size:8.5px;fill:var(--gold-hi);}
+.node-cost-bg{fill:var(--void);stroke:var(--gold-dim);stroke-width:1;}
+.link-line{fill:none;stroke:var(--blue);stroke-width:1.5;opacity:.85;filter:drop-shadow(0 0 3px rgba(124,92,255,.7));}
+.link-line.or{stroke-dasharray:6,4;}
+.link-line.mutex{stroke:var(--red);stroke-dasharray:3,3;opacity:.9;filter:drop-shadow(0 0 3px rgba(255,62,196,.7));}
+.grid-dot{fill:var(--line-soft);}
+
+/* ---------- PROPERTIES FORM ---------- */
+.form{flex:1;overflow-y:auto;padding:14px 16px 40px;}
+.form-section{margin-bottom:18px;}
+.form-section-title{
+  font-family:'NeoDunggeunmo',sans-serif;font-size:10px;letter-spacing:.15em;
+  color:var(--gold-dim);margin-bottom:9px;padding-bottom:6px;
+  border-bottom:1px solid var(--line-soft);
+}
+.field{margin-bottom:11px;}
+.field label{display:block;font-size:10.5px;color:var(--ink-mid);margin-bottom:5px;letter-spacing:.02em;}
+.field label .key{font-family:'NeoDunggeunmo Code',monospace;color:var(--ink-low);font-size:9.5px;margin-left:5px;}
+.field-note{font-family:'NeoDunggeunmo Code',monospace;font-size:9.5px;color:var(--gold-dim);margin-top:4px;}
+.field input[type=text],.field input[type=number],.field textarea,.field select{
+  width:100%;background:var(--void);border:1px solid var(--line);
+  padding:8px 9px;color:var(--ink);
+}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--gold-dim);}
+.field textarea{resize:vertical;min-height:52px;font-family:'NeoDunggeunmo Code',monospace;font-size:11.5px;line-height:1.5;}
+.field-row{display:flex;gap:8px;}
+.field-row .field{flex:1;}
+.checkline{display:flex;align-items:center;gap:8px;margin-bottom:11px;}
+.checkline input{width:15px;height:15px;accent-color:var(--gold);}
+.checkline label{font-size:11.5px;color:var(--ink-mid);}
+
+.mode-toggle{display:flex;border:1px solid var(--line);margin-bottom:6px;}
+.mode-btn{
+  flex:1;background:var(--panel-2);border:none;color:var(--ink-mid);padding:7px 6px;
+  font-size:10.5px;border-right:1px solid var(--line);white-space:nowrap;
+}
+.mode-btn:last-child{border-right:none;}
+.mode-btn.active{background:var(--panel-3);color:var(--gold-hi);text-shadow:0 0 5px rgba(183,77,255,.4);}
+.mode-hint{font-size:9.5px;color:var(--ink-low);line-height:1.5;margin-bottom:12px;}
+
+.basic-builder{border:1px solid var(--line);background:var(--void);padding:4px 2px;}
+.basic-row{display:flex;flex-direction:column;gap:7px;padding:9px 10px;border-bottom:1px solid var(--line-soft);}
+.basic-row:last-child{border-bottom:none;}
+.basic-check{display:flex;align-items:center;gap:10px;cursor:pointer;width:100%;}
+
+/* pixel/neon checkbox — styled directly on the input via appearance:none (no hidden-element trick) */
+.pixel-cb{
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  box-sizing:border-box;
+  width:16px;height:16px;min-width:16px;flex:0 0 16px;
+  margin:0;padding:0;position:relative;top:0;cursor:pointer;
+  align-self:center;vertical-align:middle;
+  background:var(--void);border:2px solid var(--line);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.4);
+}
+.basic-check:hover .pixel-cb{border-color:var(--ink-mid);}
+.pixel-cb:checked{
+  border-color:var(--gold);
+  background:rgba(183,77,255,.16);
+  box-shadow:0 0 7px rgba(183,77,255,.7), 0 0 2px rgba(183,77,255,.9);
+}
+.pixel-cb:checked::after{
+  content:'';position:absolute;left:2px;top:2px;width:8px;height:8px;
+  background:var(--gold-hi);box-shadow:0 0 5px rgba(226,169,255,.9);
+}
+.pixel-cb:focus-visible{outline:1px dashed var(--gold-hi);outline-offset:3px;}
+
+.cb-label{
+  flex:1;min-width:0;font-size:11px;color:var(--ink-mid);line-height:1.45;
+  word-break:keep-all;overflow-wrap:break-word;
+}
+.pixel-cb:checked ~ .cb-label{color:var(--ink);}
+.basic-input{
+  width:100%;margin-left:26px;max-width:calc(100% - 26px);box-sizing:border-box;
+  background:var(--panel-2);border:1px solid var(--line);
+  padding:6px 8px;color:var(--ink);font-family:'NeoDunggeunmo Code',monospace;font-size:10.5px;
+}
+.basic-input:disabled{opacity:.32;}
+.basic-input:focus{outline:none;border-color:var(--gold-dim);box-shadow:0 0 5px rgba(183,77,255,.35);}
+
+.tag-summary{display:flex;flex-wrap:wrap;gap:6px;min-height:28px;padding:8px;border:1px solid var(--line);background:var(--void);margin-bottom:8px;}
+.sel-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:'NeoDunggeunmo Code',monospace;font-size:10px;
+  padding:4px 6px 4px 9px;border:1px solid var(--gold);color:var(--gold-hi);
+  background:rgba(183,77,255,.12);box-shadow:0 0 6px rgba(183,77,255,.35);
+}
+.sel-tag.mutex{border-color:var(--red);color:var(--red-hi);background:rgba(255,62,196,.1);box-shadow:0 0 6px rgba(255,62,196,.3);}
+.sel-tag button{background:none;border:none;color:inherit;font-size:11px;padding:0 2px;opacity:.75;}
+.sel-tag button:hover{opacity:1;}
+.tag-empty{font-size:10.5px;color:var(--ink-low);align-self:center;}
+.picker-btn{width:100%;}
+
+.prereq-group{
+  display:flex;align-items:center;gap:8px;padding:5px 8px;
+  border:1px solid var(--blue);background:rgba(124,92,255,.08);
+  font-family:'NeoDunggeunmo Code',monospace;font-size:10px;width:100%;
+}
+.prereq-group.or{border-style:dashed;}
+.prereq-group .pg-badge{
+  flex:0 0 auto;font-size:8.5px;padding:2px 6px;border:1px solid var(--blue);color:var(--blue-hi);
+}
+.prereq-group .pg-names{flex:1;color:var(--ink-mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.prereq-group .pg-names em{color:var(--blue-hi);font-style:normal;}
+.prereq-group button{background:none;border:none;color:var(--ink-low);font-size:11px;flex:0 0 auto;}
+.prereq-group button:hover{color:var(--red-hi);}
+
+.picker-modal{height:64vh;}
+.picker-row .swatch{transition:border-color .12s, color .12s, box-shadow .12s;}
+.picker-row:hover .swatch{border-color:var(--ink-mid);}
+
+.picker-groups{padding:10px 16px 0;display:flex;flex-direction:column;gap:6px;max-height:120px;overflow-y:auto;}
+.picker-group-row{
+  display:flex;align-items:center;gap:8px;padding:6px 9px;
+  border:1px solid var(--line);background:var(--void);font-size:10.5px;
+}
+.picker-group-row.or{border-style:dashed;}
+.picker-group-row .pg-badge{
+  font-family:'NeoDunggeunmo Code',monospace;font-size:8.5px;padding:2px 6px;flex:0 0 auto;
+  border:1px solid var(--blue);color:var(--blue-hi);
+}
+.picker-group-row .pg-items{flex:1;color:var(--ink-mid);font-family:'NeoDunggeunmo Code',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.picker-group-row button{background:none;border:none;color:var(--ink-low);font-size:12px;}
+.picker-group-row button:hover{color:var(--red-hi);}
+
+.picker-modebar{padding:10px 16px 0;}
+.picker-tabs{display:flex;border:1px solid var(--line);}
+.picker-tab{
+  flex:1;background:var(--panel-2);border:none;color:var(--ink-mid);padding:8px 6px;
+  font-size:10px;display:flex;align-items:center;justify-content:center;gap:7px;
+  border-right:1px solid var(--line);white-space:nowrap;
+}
+.picker-tab:last-child{border-right:none;}
+.picker-tab.active{background:var(--panel-3);color:var(--gold-hi);}
+.picker-tab .line-sample{width:20px;height:0;border-top:2px solid var(--blue-hi);}
+.picker-tab .line-sample.dashed{border-top-style:dashed;}
+.picker-hint{font-size:9.5px;color:var(--ink-low);margin-top:6px;}
+
+.id-header{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid var(--line-soft);}
+.id-header .idtext{font-family:'NeoDunggeunmo Code',monospace;font-size:12px;color:var(--gold-hi);word-break:break-all;}
+.id-header .kind{font-family:'NeoDunggeunmo',sans-serif;font-size:9px;letter-spacing:.12em;color:var(--ink-low);}
+.id-header .del{margin-left:auto;}
+
+/* decision preview */
+.preview-body{flex:1;overflow-y:auto;padding:16px;}
+.preview-cat{border:1px solid var(--line);background:var(--panel-2);margin-bottom:14px;}
+.preview-cat-head{padding:10px 12px;border-bottom:1px solid var(--line-soft);}
+.preview-cat-name{font-family:'NeoDunggeunmo',sans-serif;font-size:13px;letter-spacing:.04em;color:var(--gold-hi);}
+.preview-cat-desc{font-size:10.5px;color:var(--ink-low);margin-top:3px;line-height:1.5;}
+.preview-dec{display:flex;align-items:center;gap:8px;padding:8px 12px;border-top:1px solid var(--line-soft);}
+.preview-dec:first-child{border-top:none;}
+.preview-dec .pd-icon{width:20px;height:20px;flex:0 0 20px;background:var(--panel-3);border:1px solid var(--line);}
+.preview-dec .pd-name{flex:1;font-size:11.5px;color:var(--ink);}
+.preview-dec .pd-cost{font-family:'NeoDunggeunmo Code',monospace;font-size:10px;color:var(--gold-dim);border:1px solid var(--line);padding:2px 6px;}
+
+/* ---------- MODAL ---------- */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(5,7,10,.72);
+  display:none;align-items:center;justify-content:center;z-index:100;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  width:720px;max-width:92vw;height:76vh;background:var(--panel);
+  border:1px solid var(--gold-dim);display:flex;flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,.6), 0 0 40px rgba(183,77,255,.18);
+}
+.modal-head{
+  display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);
+  font-family:'NeoDunggeunmo',sans-serif;letter-spacing:.1em;font-size:12px;color:var(--gold-hi);
+}
+.modal-head button{margin-left:auto;background:none;border:none;color:var(--ink-low);font-size:16px;}
+.modal-head button:hover{color:var(--ink);}
+.modal-tabs{display:flex;border-bottom:1px solid var(--line-soft);padding:0 10px;}
+.modal-tab{
+  background:none;border:none;padding:10px 14px;color:var(--ink-low);
+  font-family:'NeoDunggeunmo Code',monospace;font-size:11px;border-bottom:2px solid transparent;
+}
+.modal-tab.active{color:var(--gold-hi);border-bottom-color:var(--gold);}
+#codeArea{
+  flex:1;width:100%;background:#08040f;border:none;color:#d9c6ff;
+  font-family:'NeoDunggeunmo Code',monospace;font-size:11.5px;line-height:1.6;
+  padding:16px 18px;resize:none;white-space:pre;
+}
+#codeArea:focus{outline:none;}
+.modal-actions{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--line);}
+
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(8px);
+  background:var(--panel-3);border:1px solid var(--gold-dim);color:var(--ink);
+  padding:10px 18px;font-size:12px;z-index:200;opacity:0;pointer-events:none;
+  transition:opacity .18s, transform .18s;
+  box-shadow:var(--glow-purple);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">THE TOOL RISES</div>
+      <div class="sub">HOI4 CONTENT MAKER</div>
+    </div>
+    <div class="divider-v"></div>
+    <div class="tag-field">
+      <label>TAG</label>
+      <input id="tagInput" maxlength="6" value="TAG">
+    </div>
+    <div class="divider-v"></div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="focus">포커스 트리</button>
+      <button class="tab" data-tab="decision">디시전 메이커</button>
+    </nav>
+    <div class="actions">
+      <button class="icon-btn" id="btnImportProject" data-tip="프로젝트 불러오기"><span class="icon-glyph">📂&#xFE0E;</span></button>
+      <button class="icon-btn" id="btnExportProject" data-tip="프로젝트 저장"><span class="icon-glyph">💾&#xFE0E;</span></button>
+      <input type="file" id="fileImport" accept=".json" hidden>
+      <button class="icon-btn primary" id="btnExportCode" data-tip="코드 내보내기"><span class="icon-glyph">📤&#xFE0E;</span></button>
+    </div>
+  </header>
+
+  <main class="workspace">
+
+    <!-- FOCUS TREE VIEW -->
+    <section id="view-focus" class="view active">
+      <button class="panel-handle handle-left" data-view="focus" data-side="left"><span>‹</span></button>
+      <button class="panel-handle handle-right" data-view="focus" data-side="right"><span>›</span></button>
+      <aside class="panel panel-left">
+        <div class="panel-head">FOCUSES <button class="mini" id="btnAddFocus" title="새 포커스">+</button></div>
+        <div class="searchbox"><input id="focusSearch" placeholder="ID 또는 이름 검색"></div>
+        <div class="list" id="focusList"></div>
+      </aside>
+
+      <div class="canvas-wrap" id="canvasWrap">
+        <svg id="canvas" xmlns="http://www.w3.org/2000/svg">
+          <g id="gGrid"></g>
+          <g id="gLinks"></g>
+          <g id="gNodes"></g>
+        </svg>
+        <div class="canvas-corner corner-tl">FOCUS_TREE.MOD // <span id="cornerTag">TAG</span></div>
+        <div class="canvas-corner corner-tr" id="cornerCoord">X 0.0 &nbsp; Y 0.0</div>
+        <div class="canvas-hint">더블클릭: 새 포커스 추가 · 드래그: 이동 · Delete: 선택 삭제 · 휠: 확대/축소<br><span style="color:var(--blue-hi)">━</span> 필수 선행 &nbsp; <span style="color:var(--blue-hi)">┄</span> 택1 선행(OR) &nbsp; <span style="color:var(--red-hi)">┄</span> 상호배타</div>
+        <div class="canvas-zoom">
+          <button id="zoomOut">−</button><span></span>
+          <button id="zoomReset">⟳</button><span></span>
+          <button id="zoomIn">+</button>
+        </div>
+      </div>
+
+      <aside class="panel panel-right" id="focusProps">
+        <div class="empty-state">포커스를 선택하거나<br>캔버스를 더블클릭해 새로 만드세요.</div>
+      </aside>
+    </section>
+
+    <!-- DECISION MAKER VIEW -->
+    <section id="view-decision" class="view">
+      <button class="panel-handle handle-left" data-view="decision" data-side="left"><span>‹</span></button>
+      <button class="panel-handle handle-right" data-view="decision" data-side="right"><span>›</span></button>
+      <aside class="panel panel-left">
+        <div class="panel-head">CATEGORIES &amp; DECISIONS</div>
+        <div class="searchbox" style="display:flex;gap:6px;">
+          <button class="btn ghost" id="btnAddCategory" style="flex:1;">+ 카테고리</button>
+          <button class="btn ghost" id="btnAddDecision" style="flex:1;">+ 디시전</button>
+        </div>
+        <div class="list" id="catTree"></div>
+      </aside>
+
+      <aside class="panel panel-mid" id="decisionProps">
+        <div class="empty-state">카테고리 또는 디시전을<br>선택하거나 새로 만드세요.</div>
+      </aside>
+
+      <aside class="panel panel-right">
+        <div class="panel-head">미리보기</div>
+        <div class="preview-body" id="previewBody"></div>
+      </aside>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="codeModal">
+  <div class="modal">
+    <div class="modal-head"><span id="modalTitle">내보내기</span><button id="closeModal">✕</button></div>
+    <div class="modal-tabs" id="modalTabs"></div>
+    <textarea id="codeArea" readonly spellcheck="false"></textarea>
+    <div class="modal-actions">
+      <button class="btn" id="btnCopyCode">클립보드에 복사</button>
+      <button class="btn primary" id="btnDownloadCode">.txt / .yml 다운로드</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pickerOverlay">
+  <div class="modal picker-modal">
+    <div class="modal-head"><span id="pickerTitle">선행조건 선택</span><button id="pickerClose">✕</button></div>
+    <div class="picker-groups" id="pickerGroups"></div>
+    <div class="picker-modebar" id="pickerModeBar">
+      <div class="picker-tabs">
+        <button class="picker-tab active" id="pickerTabAnd" data-mode="and">+ 필수 선행 추가 <span class="line-sample solid"></span></button>
+        <button class="picker-tab" id="pickerTabOr" data-mode="or">+ 택1(OR) 그룹 추가 <span class="line-sample dashed"></span></button>
+      </div>
+      <div class="picker-hint" id="pickerHint">클릭한 포커스가 곧바로 필수 선행으로 추가됩니다.</div>
+    </div>
+    <div class="searchbox"><input id="pickerSearch" placeholder="ID 또는 이름 검색"></div>
+    <div class="list" id="pickerList"></div>
+    <div class="modal-actions">
+      <button class="btn primary" id="pickerStage" style="display:none;">이 그룹으로 묶기</button>
+      <button class="btn ghost" id="pickerDone">완료</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  tag: "TAG",
+  focuses: [],
+  categories: [],
+  decisions: [],
+  selection: null, // {type:'focus'|'category'|'decision', id}
+};
+
+let uidCounter = 1;
+function uid(){ return "n" + (uidCounter++) + "_" + Math.random().toString(36).slice(2,7); }
+
+function slug(str){
+  return (str||"").toUpperCase().replace(/[^A-Z0-9_]+/g,"_").replace(/^_+|_+$/g,"");
+}
+
+/* ============================================================
+   DEFAULT FACTORIES
+   ============================================================ */
+function newFocus(x, y){
+  const n = state.focuses.length + 1;
+  return {
+    _uid: uid(),
+    id: state.tag + "_focus_" + n,
+    name: "새 포커스 " + n,
+    desc: "",
+    icon: "GFX_goal_generic",
+    x: x, y: y,
+    cost: 10,
+    prereqGroups: [], // array of arrays of focus _uid -> OR within group (dashed), AND across groups (solid)
+    mutex: [],         // array of focus _uid
+    available: "",
+    bypass: "",
+    completionReward: "add_political_power = 50",
+    selectEffect: "",
+    aiWillDo: "factor = 1",
+    _basic: {
+      focusReward: { pp: { on:true, val:'50' } },
+      focusAi: { factor: { on:true, val:'1' } },
+    },
+  };
+}
+function newCategory(){
+  const n = state.categories.length + 1;
+  return {
+    _uid: uid(),
+    id: state.tag + "_category_" + n,
+    name: "새 카테고리 " + n,
+    desc: "",
+    icon: "GFX_decision_category_generic",
+    priority: 1,
+    visible: true, // export visibility toggle ("hidden" in docs)
+    allowed: "",
+    visibleTrigger: "",
+    _basic: {},
+  };
+}
+function newDecision(categoryUid){
+  const n = state.decisions.length + 1;
+  return {
+    _uid: uid(),
+    id: state.tag + "_decision_" + n,
+    categoryUid: categoryUid,
+    name: "새 디시전 " + n,
+    desc: "",
+    icon: "GFX_decision_generic",
+    cost: 25,
+    daysRemove: "",
+    daysReEnable: "",
+    fireOnlyOnce: false,
+    allowed: "",
+    visible: "",
+    available: "",
+    completeEffect: "",
+    aiWillDo: "factor = 1",
+    _basic: {
+      decAi: { factor: { on:true, val:'1' } },
+    },
+  };
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function byUid(arr, u){ return arr.find(o => o._uid === u); }
+function focusByUid(u){ return byUid(state.focuses, u); }
+function catByUid(u){ return byUid(state.categories, u); }
+function decisionsInCat(catUid){ return state.decisions.filter(d => d.categoryUid === catUid); }
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._h);
+  toast._h = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+function escXml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function ymlEscape(s){ return (s||"").replace(/"/g,'\\"'); }
+function indentBlock(text, spaces){
+  const pad = " ".repeat(spaces);
+  return (text||"").split("\n").map(l=>l.trim().length?pad+l:"").filter(l=>l.length).join("\n");
+}
+
+/* ============================================================
+   PANEL TOGGLES — each tab has its own pair of edge handles,
+   fully independent of one another (separate buttons, separate state)
+   ============================================================ */
+const panelState = {
+  focus:    { left:true, right:true },
+  decision: { left:true, right:true },
+};
+const PANEL_LEFT_WIDTH = 250; // must match .panel-left width in CSS
+
+function applyPanelButton(btn){
+  const viewName = btn.dataset.view;
+  const side = btn.dataset.side; // 'left' | 'right'
+  const st = panelState[viewName];
+  const section = document.getElementById('view-' + viewName);
+  const panel = section.querySelector(side === 'left' ? '.panel-left' : '.panel-right');
+  const open = st[side];
+  if(panel) panel.classList.toggle('collapsed', !open);
+  btn.classList.toggle('collapsed', !open);
+  btn.querySelector('span').textContent = side === 'left' ? (open ? '‹' : '›') : (open ? '›' : '‹');
+  const label = side === 'left' ? '왼쪽' : '오른쪽';
+  btn.dataset.tip = open ? `${label} 패널 접기` : `${label} 패널 펴기`;
+}
+
+document.querySelectorAll('.panel-handle').forEach(btn=>{
+  applyPanelButton(btn); // set correct initial icon/tooltip
+  btn.addEventListener('click', ()=>{
+    const viewName = btn.dataset.view;
+    const side = btn.dataset.side;
+    const st = panelState[viewName];
+    st[side] = !st[side];
+    // panel-left sits before the canvas, so collapsing/expanding it shifts the
+    // canvas element's own origin on the page. Compensate panX by the same
+    // amount so the tree itself doesn't appear to slide — only the panel does.
+    // (Only the focus tab has a canvas.)
+    if(viewName === 'focus' && side === 'left'){
+      view.panX += st.left ? -PANEL_LEFT_WIDTH : PANEL_LEFT_WIDTH;
+    }
+    applyPanelButton(btn);
+    if(viewName === 'focus') renderCanvas();
+  });
+});
+// re-sync the canvas once the slide animation actually finishes (widths settle)
+document.querySelectorAll('#view-focus .panel-left, #view-focus .panel-right').forEach(el=>{
+  el.addEventListener('transitionend', (e)=>{ if(e.propertyName==='width') renderCanvas(); });
+});
+
+/* ============================================================
+   TAB SWITCHING
+   ============================================================ */
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-' + tab.dataset.tab).classList.add('active');
+    if(tab.dataset.tab === 'decision') renderDecisionView();
+    else renderCanvas();
+  });
+});
+
+/* ============================================================
+   TAG INPUT
+   ============================================================ */
+const tagInput = document.getElementById('tagInput');
+tagInput.value = state.tag;
+tagInput.addEventListener('input', ()=>{
+  state.tag = slug(tagInput.value) || "TAG";
+  document.getElementById('cornerTag').textContent = state.tag;
+});
+tagInput.addEventListener('blur', ()=>{ tagInput.value = state.tag; });
+
+/* ============================================================
+   CANVAS: focus tree
+   ============================================================ */
+const SPX = 100, SPY = 110, NODE = 56;
+let view = { scale: 1, panX: 60, panY: 60 };
+let dragNode = null, dragStart = null, dragMoved = false, dragPointerId = null;
+let hoveredUid = null;
+
+const svg = document.getElementById('canvas');
+const gGrid = document.getElementById('gGrid');
+const gLinks = document.getElementById('gLinks');
+const gNodes = document.getElementById('gNodes');
+const canvasWrap = document.getElementById('canvasWrap');
+
+function gridToScreen(gx, gy){
+  return { x: gx*SPX*view.scale + view.panX, y: gy*SPY*view.scale + view.panY };
+}
+function screenToGrid(sx, sy){
+  return { x: (sx - view.panX)/(SPX*view.scale), y: (sy - view.panY)/(SPY*view.scale) };
+}
+
+function renderGrid(){
+  const rect = canvasWrap.getBoundingClientRect();
+  gGrid.innerHTML = "";
+  const step = SPX * view.scale / 2;
+  if(step < 8) return;
+  const startX = view.panX % step;
+  const startY = view.panY % step;
+  let html = "";
+  for(let x = startX; x < rect.width; x += step){
+    for(let y = startY; y < rect.height; y += step){
+      html += `<circle class="grid-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1"></circle>`;
+    }
+  }
+  gGrid.innerHTML = html;
+}
+
+function svgPath(x1,y1,x2,y2){
+  const midY = (y1+y2)/2;
+  return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
+}
+
+function renderLinks(){
+  let html = "";
+  state.focuses.forEach(f=>{
+    const to = gridToScreen(f.x, f.y);
+    (f.prereqGroups||[]).forEach(group=>{
+      const isOr = group.length > 1; // multiple focuses in one prerequisite block = OR (dashed)
+      group.forEach(srcUid=>{
+        const src = focusByUid(srcUid);
+        if(!src) return;
+        const from = gridToScreen(src.x, src.y);
+        html += `<path class="link-line ${isOr?'or':''}" d="${svgPath(from.x, from.y+NODE*view.scale/2, to.x, to.y-NODE*view.scale/2)}"></path>`;
+      });
+    });
+  });
+  // mutex drawn once per pair
+  const drawnMutex = new Set();
+  state.focuses.forEach(f=>{
+    (f.mutex||[]).forEach(mUid=>{
+      const key = [f._uid,mUid].sort().join('|');
+      if(drawnMutex.has(key)) return;
+      drawnMutex.add(key);
+      const other = focusByUid(mUid);
+      if(!other) return;
+      const a = gridToScreen(f.x, f.y);
+      const b = gridToScreen(other.x, other.y);
+      html += `<path class="link-line mutex" d="M ${a.x} ${a.y} L ${b.x} ${b.y}"></path>`;
+    });
+  });
+  gLinks.innerHTML = html;
+}
+
+function renderNodes(){
+  let html = "";
+  state.focuses.forEach(f=>{
+    const p = gridToScreen(f.x, f.y);
+    const s = view.scale;
+    const w = NODE*s, h = NODE*s;
+    const selected = state.selection && state.selection.type==='focus' && state.selection.id===f._uid;
+    const hovered = hoveredUid === f._uid;
+    const cls = "node-plate" + (selected?" selected":"") + (hovered?" hovered":"");
+    const label = escXml(f.name || f.id);
+    const days = (f.cost||0) * 7;
+    const daysLabel = days + "일";
+    html += `
+    <g class="node" data-uid="${f._uid}" transform="translate(${p.x-w/2},${p.y-h/2})" style="cursor:grab;">
+      <rect class="${cls}" width="${w}" height="${h}" rx="2"></rect>
+      <rect class="node-icon" x="${w*0.18}" y="${h*0.14}" width="${w*0.64}" height="${h*0.64}"></rect>
+      <text class="node-label" x="${w/2}" y="${h+12*s}" text-anchor="middle">${label.length>16?label.slice(0,15)+"…":label}</text>
+      <rect class="node-cost-bg" x="${-6}" y="${-8}" width="${Math.max(24,daysLabel.length*7+10)}" height="14"></rect>
+      <text class="node-cost" x="${-6+Math.max(24,daysLabel.length*7+10)/2}" y="2" text-anchor="middle">${daysLabel}</text>
+    </g>`;
+  });
+  gNodes.innerHTML = html;
+
+  gNodes.querySelectorAll('.node').forEach(el=>{
+    const u = el.dataset.uid;
+    el.addEventListener('pointerdown', (e)=> onNodePointerDown(e, u));
+    el.addEventListener('mouseenter', ()=>{ hoveredUid = u; renderNodes(); });
+    el.addEventListener('mouseleave', ()=>{ if(hoveredUid===u){hoveredUid=null; renderNodes();} });
+  });
+}
+
+function renderCanvas(){
+  const rect = canvasWrap.getBoundingClientRect();
+  svg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
+  renderGrid();
+  renderLinks();
+  renderNodes();
+}
+
+function selectFocus(u){
+  state.selection = u ? {type:'focus', id:u} : null;
+  renderFocusList();
+  renderFocusProps();
+  renderCanvas();
+}
+
+/* --- node drag --- */
+function onNodePointerDown(e, u){
+  e.preventDefault(); e.stopPropagation();
+  selectFocus(u);
+  const f = focusByUid(u);
+  dragNode = u;
+  dragMoved = false;
+  dragPointerId = e.pointerId;
+  const rect = canvasWrap.getBoundingClientRect();
+  dragStart = { mx: e.clientX-rect.left, my: e.clientY-rect.top, fx: f.x, fy: f.y };
+  window.addEventListener('pointermove', onNodePointerMove);
+  window.addEventListener('pointerup', onNodePointerUp);
+  window.addEventListener('pointercancel', onNodePointerUp);
+  window.addEventListener('blur', onNodePointerUp);
+}
+function onNodePointerMove(e){
+  if(!dragNode) return;
+  // Safety net: if the mouse button is no longer pressed but we never received
+  // the matching pointerup (this can happen because selecting a focus re-renders
+  // the canvas and destroys the node element mid-interaction), bail out now
+  // instead of letting the node follow the cursor forever.
+  if(e.buttons === 0){ onNodePointerUp(); return; }
+  const f = focusByUid(dragNode);
+  if(!f){ onNodePointerUp(); return; }
+  const rect = canvasWrap.getBoundingClientRect();
+  const mx = e.clientX-rect.left, my = e.clientY-rect.top;
+  const dx = (mx - dragStart.mx)/(SPX*view.scale);
+  const dy = (my - dragStart.my)/(SPY*view.scale);
+  if(Math.abs(mx-dragStart.mx)>2 || Math.abs(my-dragStart.my)>2) dragMoved = true;
+  f.x = Math.round((dragStart.fx + dx)*2)/2;
+  f.y = Math.round(dragStart.fy + dy);
+  renderCanvas();
+  if(state.selection && state.selection.id===f._uid){
+    const xEl = document.getElementById('propX'), yEl = document.getElementById('propY');
+    if(xEl) xEl.value = f.x;
+    if(yEl) yEl.value = f.y;
+  }
+}
+function onNodePointerUp(){
+  dragNode = null;
+  dragPointerId = null;
+  window.removeEventListener('pointermove', onNodePointerMove);
+  window.removeEventListener('pointerup', onNodePointerUp);
+  window.removeEventListener('pointercancel', onNodePointerUp);
+  window.removeEventListener('blur', onNodePointerUp);
+}
+// Extra global safety net: any stray pointerup/pointercancel anywhere clears a stuck drag.
+window.addEventListener('pointerup', ()=>{ if(dragNode) onNodePointerUp(); });
+window.addEventListener('pointercancel', ()=>{ if(dragNode) onNodePointerUp(); });
+
+/* --- canvas double-click add / pan / zoom --- */
+canvasWrap.addEventListener('contextmenu', (e)=> e.preventDefault());
+canvasWrap.addEventListener('dblclick', (e)=>{
+  if(e.target.closest && e.target.closest('.node')) return; // don't create on top of an existing node
+  e.preventDefault();
+  const rect = canvasWrap.getBoundingClientRect();
+  const g = screenToGrid(e.clientX-rect.left, e.clientY-rect.top);
+  const f = newFocus(Math.round(g.x*2)/2, Math.round(g.y));
+  state.focuses.push(f);
+  selectFocus(f._uid);
+  renderFocusList();
+  toast("포커스 추가됨: " + f.id);
+});
+canvasWrap.addEventListener('click', (e)=>{
+  if(e.target === svg || e.target.tagName === 'circle'){
+    selectFocus(null);
+  }
+});
+
+let isPanning = false, panStart = null;
+canvasWrap.addEventListener('pointerdown', (e)=>{
+  if(e.button===1 || e.ctrlKey || e.metaKey){
+    isPanning = true;
+    panStart = { x:e.clientX, y:e.clientY, panX:view.panX, panY:view.panY };
+    canvasWrap.style.cursor = 'grabbing';
+  }
+});
+window.addEventListener('pointermove', (e)=>{
+  if(isPanning){
+    view.panX = panStart.panX + (e.clientX - panStart.x);
+    view.panY = panStart.panY + (e.clientY - panStart.y);
+    renderCanvas();
+  }
+});
+window.addEventListener('pointerup', ()=>{ isPanning=false; canvasWrap.style.cursor='default'; });
+
+canvasWrap.addEventListener('wheel', (e)=>{
+  e.preventDefault();
+  const rect = canvasWrap.getBoundingClientRect();
+  const mx = e.clientX-rect.left, my = e.clientY-rect.top;
+  const before = screenToGrid(mx,my);
+  view.scale = Math.min(2.2, Math.max(0.35, view.scale * (e.deltaY<0?1.08:0.92)));
+  const after = gridToScreen(before.x, before.y);
+  view.panX += mx - after.x;
+  view.panY += my - after.y;
+  renderCanvas();
+},{passive:false});
+
+document.getElementById('zoomIn').onclick = ()=>{ view.scale=Math.min(2.2,view.scale*1.15); renderCanvas(); };
+document.getElementById('zoomOut').onclick = ()=>{ view.scale=Math.max(0.35,view.scale*0.87); renderCanvas(); };
+document.getElementById('zoomReset').onclick = ()=>{ view.scale=1; view.panX=60; view.panY=60; renderCanvas(); };
+
+window.addEventListener('resize', ()=>{ renderCanvas(); });
+
+document.addEventListener('keydown', (e)=>{
+  const activeIsField = ['INPUT','TEXTAREA'].includes(document.activeElement.tagName);
+  if(activeIsField) return;
+  if(document.getElementById('view-focus').classList.contains('active')){
+    if((e.key==='Delete'||e.key==='Backspace') && state.selection && state.selection.type==='focus'){
+      deleteFocus(state.selection.id);
+    }
+    if(e.key==='d' && (e.ctrlKey||e.metaKey) && state.selection && state.selection.type==='focus'){
+      e.preventDefault();
+      duplicateFocus(state.selection.id);
+    }
+  }
+});
+
+function deleteFocus(u){
+  state.focuses = state.focuses.filter(f=>f._uid!==u);
+  state.focuses.forEach(f=>{
+    f.prereqGroups = (f.prereqGroups||[]).map(g=>g.filter(x=>x!==u)).filter(g=>g.length);
+    f.mutex = (f.mutex||[]).filter(x=>x!==u);
+  });
+  if(state.selection && state.selection.id===u) state.selection=null;
+  renderFocusList(); renderFocusProps(); renderCanvas();
+  toast("포커스 삭제됨");
+}
+function duplicateFocus(u){
+  const f = focusByUid(u);
+  if(!f) return;
+  const copy = JSON.parse(JSON.stringify(f));
+  copy._uid = uid();
+  copy.id = f.id + "_copy";
+  copy.x = f.x + 1;
+  copy.y = f.y + 1;
+  state.focuses.push(copy);
+  selectFocus(copy._uid);
+  renderFocusList();
+  toast("포커스 복제됨");
+}
+
+/* ============================================================
+   FOCUS LIST (left panel)
+   ============================================================ */
+function renderFocusList(){
+  const wrap = document.getElementById('focusList');
+  const q = (document.getElementById('focusSearch').value||"").toLowerCase();
+  const items = state.focuses.filter(f=> !q || f.id.toLowerCase().includes(q) || (f.name||"").toLowerCase().includes(q));
+  if(!items.length){
+    wrap.innerHTML = `<div class="empty-state">${state.focuses.length? "검색 결과 없음" : "포커스가 없습니다.<br>캔버스를 더블클릭하세요."}</div>`;
+    return;
+  }
+  wrap.innerHTML = items.map(f=>{
+    const sel = state.selection && state.selection.type==='focus' && state.selection.id===f._uid;
+    return `<div class="row ${sel?'selected':''}" data-uid="${f._uid}">
+      <div class="swatch">◆</div>
+      <div class="rtext"><div class="rname">${escXml(f.name||f.id)}</div><div class="rid">${escXml(f.id)}</div></div>
+      <div class="rbadge">${(f.cost||0)*7}일</div>
+      <button class="rdel" data-del="${f._uid}" title="삭제">✕</button>
+    </div>`;
+  }).join("");
+  wrap.querySelectorAll('.row').forEach(row=>{
+    row.addEventListener('click', (e)=>{
+      if(e.target.dataset.del) return;
+      selectFocus(row.dataset.uid);
+    });
+  });
+  wrap.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{ e.stopPropagation(); deleteFocus(btn.dataset.del); });
+  });
+}
+document.getElementById('focusSearch').addEventListener('input', renderFocusList);
+
+/* ============================================================
+   PREREQUISITE / MUTEX PICKER POPUP
+   ============================================================ */
+let pickerCtx = null; // { focusUid, mode: 'prereq' | 'mutex', addMode: 'and'|'or', staged: Set }
+const pickerOverlay = document.getElementById('pickerOverlay');
+const pickerList = document.getElementById('pickerList');
+const pickerSearch = document.getElementById('pickerSearch');
+const pickerGroups = document.getElementById('pickerGroups');
+const pickerModeBar = document.getElementById('pickerModeBar');
+const pickerHint = document.getElementById('pickerHint');
+const pickerStageBtn = document.getElementById('pickerStage');
+const pickerTabAnd = document.getElementById('pickerTabAnd');
+const pickerTabOr = document.getElementById('pickerTabOr');
+
+function openPicker(mode){
+  const sel = state.selection;
+  if(!sel || sel.type!=='focus') return;
+  pickerCtx = { focusUid: sel.id, mode, addMode: 'and', staged: new Set() };
+  document.getElementById('pickerTitle').textContent = mode==='prereq' ? '선행조건 선택' : '상호배타 선택';
+  pickerSearch.value = '';
+  pickerModeBar.style.display = mode==='prereq' ? '' : 'none';
+  pickerStageBtn.style.display = 'none';
+  renderPickerGroups();
+  renderPickerList();
+  pickerOverlay.classList.add('open');
+  setTimeout(()=>pickerSearch.focus(), 30);
+}
+function closePicker(){
+  pickerOverlay.classList.remove('open');
+  pickerCtx = null;
+  renderFocusProps();
+}
+function renderPickerGroups(){
+  if(!pickerCtx || pickerCtx.mode!=='prereq'){ pickerGroups.innerHTML=''; return; }
+  const f = focusByUid(pickerCtx.focusUid);
+  if(!f || !(f.prereqGroups||[]).length){ pickerGroups.innerHTML=''; return; }
+  pickerGroups.innerHTML = f.prereqGroups.map((g,gi)=>{
+    const isOr = g.length>1;
+    const names = g.map(u=>{const o=focusByUid(u); return o?o.id:'?';}).join(isOr?' 또는 ':' + ');
+    return `<div class="picker-group-row ${isOr?'or':''}">
+      <span class="pg-badge">${isOr?'택1':'필수'}</span>
+      <span class="pg-items">${escXml(names)}</span>
+      <button data-rm-group="${gi}" title="그룹 삭제">✕</button>
+    </div>`;
+  }).join('');
+  pickerGroups.querySelectorAll('[data-rm-group]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const gi = parseInt(btn.dataset.rmGroup);
+      f.prereqGroups.splice(gi,1);
+      renderPickerGroups();
+      renderPickerList();
+      renderCanvas();
+    });
+  });
+}
+function setPickerAddMode(m){
+  pickerCtx.addMode = m;
+  pickerCtx.staged = new Set();
+  pickerTabAnd.classList.toggle('active', m==='and');
+  pickerTabOr.classList.toggle('active', m==='or');
+  pickerHint.textContent = m==='and'
+    ? '클릭한 포커스가 곧바로 필수 선행(실선)으로 추가됩니다.'
+    : '함께 묶을 포커스들을 클릭한 뒤 "이 그룹으로 묶기"를 누르세요 — 그 중 하나만 완료하면 됩니다(점선).';
+  pickerStageBtn.style.display = m==='or' ? '' : 'none';
+  renderPickerList();
+}
+pickerTabAnd.addEventListener('click', ()=> setPickerAddMode('and'));
+pickerTabOr.addEventListener('click', ()=> setPickerAddMode('or'));
+pickerStageBtn.addEventListener('click', ()=>{
+  const f = focusByUid(pickerCtx.focusUid);
+  if(!f || pickerCtx.staged.size===0) return;
+  const staged = [...pickerCtx.staged];
+  // remove staged focuses from any existing groups first, then add as one new OR group
+  f.prereqGroups = (f.prereqGroups||[]).map(g=>g.filter(x=>!staged.includes(x))).filter(g=>g.length);
+  f.prereqGroups.push(staged);
+  pickerCtx.staged = new Set();
+  renderPickerGroups();
+  renderPickerList();
+  renderCanvas();
+  toast(staged.length>1 ? "택1(OR) 그룹으로 묶었습니다" : "필수 선행으로 추가됨");
+});
+
+function renderPickerList(){
+  if(!pickerCtx) return;
+  const f = focusByUid(pickerCtx.focusUid);
+  if(!f) return;
+  const q = (pickerSearch.value||"").toLowerCase();
+  const others = state.focuses.filter(o=> o._uid!==f._uid && (!q || o.id.toLowerCase().includes(q) || (o.name||"").toLowerCase().includes(q)));
+  if(!others.length){
+    pickerList.innerHTML = `<div class="empty-state">${state.focuses.length>1 ? '검색 결과 없음' : '선택할 다른 포커스가 없습니다'}</div>`;
+    return;
+  }
+  const isMutex = pickerCtx.mode==='mutex';
+  const activeSet = isMutex ? new Set(f.mutex||[]) : new Set((f.prereqGroups||[]).flat());
+  const orGroupOf = new Map();
+  if(!isMutex){
+    (f.prereqGroups||[]).forEach(g=>{ if(g.length>1) g.forEach(u=>orGroupOf.set(u,true)); });
+  }
+  pickerList.innerHTML = others.map(o=>{
+    const staged = pickerCtx.mode==='prereq' && pickerCtx.addMode==='or' && pickerCtx.staged.has(o._uid);
+    const on = activeSet.has(o._uid);
+    let style = '', mark = '◇';
+    if(staged){
+      style = 'border-color:var(--red);color:var(--red-hi);box-shadow:0 0 6px rgba(255,62,196,.5);';
+      mark = '◆';
+    } else if(on){
+      style = isMutex
+        ? 'border-color:var(--red);color:var(--red-hi);box-shadow:0 0 6px rgba(255,62,196,.5);'
+        : 'border-color:var(--gold);color:var(--gold-hi);box-shadow:0 0 6px rgba(183,77,255,.5);';
+      mark = orGroupOf.has(o._uid) ? '◈' : '✓';
+    }
+    return `<div class="row picker-row ${on&&!staged?'selected':''}" data-uid="${o._uid}">
+      <div class="swatch" style="${style}">${mark}</div>
+      <div class="rtext"><div class="rname">${escXml(o.name||o.id)}</div><div class="rid">${escXml(o.id)}</div></div>
+    </div>`;
+  }).join("");
+  pickerList.querySelectorAll('.picker-row').forEach(row=>{
+    row.addEventListener('click', ()=> togglePickerItem(row.dataset.uid));
+  });
+}
+function togglePickerItem(uid){
+  const f = focusByUid(pickerCtx.focusUid);
+  if(!f) return;
+  if(pickerCtx.mode==='mutex'){
+    f.mutex = f.mutex||[];
+    const i = f.mutex.indexOf(uid);
+    if(i>=0) f.mutex.splice(i,1); else f.mutex.push(uid);
+    renderPickerList();
+    renderCanvas();
+    return;
+  }
+  // prereq mode
+  if(pickerCtx.addMode==='or'){
+    if(pickerCtx.staged.has(uid)) pickerCtx.staged.delete(uid); else pickerCtx.staged.add(uid);
+    renderPickerList();
+    return;
+  }
+  // AND mode: toggle a standalone mandatory (solid) group; if the focus is
+  // currently part of an OR group, this removes it from there instead.
+  const flat = new Set((f.prereqGroups||[]).flat());
+  if(flat.has(uid)){
+    f.prereqGroups = (f.prereqGroups||[]).map(g=>g.filter(x=>x!==uid)).filter(g=>g.length);
+  } else {
+    f.prereqGroups = f.prereqGroups||[];
+    f.prereqGroups.push([uid]);
+  }
+  renderPickerGroups();
+  renderPickerList();
+  renderCanvas();
+}
+pickerSearch.addEventListener('input', renderPickerList);
+document.getElementById('pickerClose').addEventListener('click', closePicker);
+document.getElementById('pickerDone').addEventListener('click', closePicker);
+pickerOverlay.addEventListener('click', (e)=>{ if(e.target===pickerOverlay) closePicker(); });
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Escape' && pickerOverlay.classList.contains('open')) closePicker();
+});
+document.getElementById('btnAddFocus').addEventListener('click', ()=>{
+  const f = newFocus(state.focuses.length? Math.max(...state.focuses.map(x=>x.x))+1 : 0, 0);
+  state.focuses.push(f);
+  selectFocus(f._uid);
+  renderFocusList();
+});
+
+/* ============================================================
+   BASIC MODE — guided option builder for trigger/effect fields
+   ============================================================ */
+let editorMode = 'basic'; // 'basic' | 'advanced' — applies to both focus & decision panels
+
+const BASIC_SPECS = {
+  focusAvailable: [
+    { id:'alwaysYes',  type:'flag',   label:'항상 사용 가능',                 line:()=>'always = yes' },
+    { id:'alwaysNo',   type:'flag',   label:'항상 사용 불가',                 line:()=>'always = no' },
+    { id:'ownsState',  type:'number', label:'특정 주(State)를 보유하고 있을 때', placeholder:'주 번호 예: 42', line:v=>`owns_state = ${v}` },
+    { id:'notAtWar',   type:'flag',   label:'전쟁 중이 아닐 때만',            line:()=>'has_war = no' },
+    { id:'atWar',      type:'flag',   label:'전쟁 중일 때만',                line:()=>'has_war = yes' },
+    { id:'tag',        type:'text',   label:'특정 국가 태그일 때',           placeholder:'예: GER', line:v=>`tag = ${slug(v)}` },
+    { id:'stabilityMin', type:'number', label:'최소 안정도 이상 (0~1)',       placeholder:'0.5', line:v=>`stability > ${v}` },
+    { id:'warSupportMin', type:'number', label:'최소 전쟁 지지도 이상 (0~1)', placeholder:'0.3', line:v=>`war_support > ${v}` },
+    { id:'dateAfter',  type:'text',   label:'특정 날짜 이후',                placeholder:'1938.1.1', line:v=>`date > ${v}` },
+  ],
+  focusBypass: [
+    { id:'alwaysYes', type:'flag', label:'항상 우회(자동 완료)',             line:()=>'always = yes' },
+    { id:'alwaysNo',  type:'flag', label:'절대 우회하지 않음',               line:()=>'always = no' },
+    { id:'hasFlag',   type:'text', label:'국가 플래그를 가지고 있을 때',     placeholder:'flag_name', line:v=>`has_country_flag = ${v}` },
+    { id:'notHasFlag',type:'text', label:'국가 플래그가 없을 때',           placeholder:'flag_name', line:v=>`NOT = { has_country_flag = ${v} }` },
+  ],
+  focusReward: [
+    { id:'pp',        type:'number', label:'정치력 추가',            placeholder:'50', line:v=>`add_political_power = ${v}` },
+    { id:'stability',type:'number', label:'안정도 추가 (0~1)',       placeholder:'0.05', line:v=>`add_stability = ${v}` },
+    { id:'warSupport',type:'number', label:'전쟁 지지도 추가 (0~1)', placeholder:'0.05', line:v=>`add_war_support = ${v}` },
+    { id:'armyXp',    type:'number', label:'육군 경험치 추가',        placeholder:'20', line:v=>`army_experience = ${v}` },
+    { id:'navyXp',    type:'number', label:'해군 경험치 추가',        placeholder:'20', line:v=>`navy_experience = ${v}` },
+    { id:'airXp',     type:'number', label:'공군 경험치 추가',        placeholder:'20', line:v=>`air_experience = ${v}` },
+    { id:'flag',      type:'text',   label:'국가 플래그 설정',        placeholder:'flag_name', line:v=>`set_country_flag = ${v}` },
+    { id:'idea',      type:'text',   label:'아이디어(모디파이어) 추가', placeholder:'idea_id', line:v=>`add_ideas = ${v}` },
+    { id:'event',     type:'text',   label:'이벤트 발생',            placeholder:'event_id', line:v=>`country_event = { id = ${v} }` },
+  ],
+  focusSelect: [
+    { id:'newsEvent', type:'text', label:'선택 시 뉴스 이벤트 발생', placeholder:'event_id', line:v=>`news_event = { id = ${v} }` },
+    { id:'customTooltip', type:'flag', label:'커스텀 효과 툴팁 표시', line:()=>'custom_effect_tooltip = focus_generic_tt' },
+  ],
+  focusAi: [
+    { id:'factor', type:'number', label:'AI 선택 가중치 (factor)', placeholder:'1', line:v=>`factor = ${v}` },
+    { id:'zero',   type:'flag',   label:'AI가 이 포커스를 선택하지 않음', line:()=>'factor = 0' },
+  ],
+  decAllowed: [
+    { id:'alwaysYes', type:'flag', label:'항상 허용',           line:()=>'always = yes' },
+    { id:'alwaysNo',  type:'flag', label:'항상 허용 안 함',     line:()=>'always = no' },
+    { id:'tag',       type:'text', label:'특정 국가 태그일 때', placeholder:'GER', line:v=>`tag = ${slug(v)}` },
+  ],
+  decVisible: [
+    { id:'alwaysYes', type:'flag', label:'항상 표시',       line:()=>'always = yes' },
+    { id:'alwaysNo',  type:'flag', label:'항상 숨김',       line:()=>'always = no' },
+    { id:'atWar',     type:'flag', label:'전쟁 중일 때만', line:()=>'has_war = yes' },
+  ],
+  decAvailable: [
+    { id:'alwaysYes', type:'flag', label:'항상 실행 가능',              line:()=>'always = yes' },
+    { id:'alwaysNo',  type:'flag', label:'항상 실행 불가',              line:()=>'always = no' },
+    { id:'hasFlag',   type:'text', label:'국가 플래그를 가지고 있을 때', placeholder:'flag_name', line:v=>`has_country_flag = ${v}` },
+    { id:'notAtWar',  type:'flag', label:'전쟁 중이 아닐 때만',         line:()=>'has_war = no' },
+  ],
+  decComplete: [
+    { id:'pp',        type:'number', label:'정치력 추가',            placeholder:'0', line:v=>`add_political_power = ${v}` },
+    { id:'stability', type:'number', label:'안정도 추가 (0~1)',       placeholder:'0.05', line:v=>`add_stability = ${v}` },
+    { id:'warSupport',type:'number', label:'전쟁 지지도 추가 (0~1)',  placeholder:'0.05', line:v=>`add_war_support = ${v}` },
+    { id:'flag',      type:'text',   label:'국가 플래그 설정',        placeholder:'flag_name', line:v=>`set_country_flag = ${v}` },
+    { id:'idea',      type:'text',   label:'아이디어(모디파이어) 추가', placeholder:'idea_id', line:v=>`add_ideas = ${v}` },
+  ],
+  decAi: [
+    { id:'factor', type:'number', label:'AI 선택 가중치 (factor)', placeholder:'1', line:v=>`factor = ${v}` },
+  ],
+};
+
+function ensureBasic(obj){ obj._basic = obj._basic || {}; return obj._basic; }
+
+function modeToggleHtml(){
+  return `<div class="mode-toggle">
+    <button class="mode-btn ${editorMode==='basic'?'active':''}" data-set-mode="basic">기본 모드</button>
+    <button class="mode-btn ${editorMode==='advanced'?'active':''}" data-set-mode="advanced">고급 모드</button>
+  </div>
+  <div class="mode-hint">${editorMode==='basic'
+    ? '체크한 옵션이 자동으로 스크립트로 변환됩니다. 더 세밀한 제어가 필요하면 고급 모드를 사용하세요.'
+    : '원하는 Paradox 스크립트를 직접 작성합니다.'}</div>`;
+}
+function bindModeToggle(panel, rerenderFn){
+  panel.querySelectorAll('[data-set-mode]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      editorMode = btn.dataset.setMode;
+      rerenderFn();
+    });
+  });
+}
+
+function basicFieldHtml(labelText, hoiKey, specKey, obj){
+  const specs = BASIC_SPECS[specKey];
+  const basic = ensureBasic(obj)[specKey] || {};
+  const rows = specs.map(s=>{
+    const st = basic[s.id] || {on:false, val:''};
+    const valAttr = escXml(st.val!==undefined ? st.val : '');
+    return `<div class="basic-row">
+      <label class="basic-check">
+        <input type="checkbox" class="pixel-cb" data-opt="${s.id}" ${st.on?'checked':''}>
+        <span class="cb-label">${escXml(s.label)}</span>
+      </label>
+      ${s.type!=='flag' ? `<input type="${s.type==='number'?'number':'text'}" ${s.type==='number'?'step="any"':''} class="basic-input" data-optval="${s.id}" placeholder="${escXml(s.placeholder||'')}" value="${valAttr}" ${st.on?'':'disabled'}>` : ''}
+    </div>`;
+  }).join('');
+  return `<div class="field">
+    <label>${labelText} <span class="key">${hoiKey}</span></label>
+    <div class="basic-builder" data-spec="${specKey}">${rows}</div>
+  </div>`;
+}
+function bindBasicField(panel, specKey, obj, targetKey, onChange){
+  const wrap = panel.querySelector(`.basic-builder[data-spec="${specKey}"]`);
+  if(!wrap) return;
+  const specs = BASIC_SPECS[specKey];
+  const basic = ensureBasic(obj);
+  basic[specKey] = basic[specKey] || {};
+  function recompute(){
+    obj[targetKey] = specs
+      .filter(s=> basic[specKey][s.id] && basic[specKey][s.id].on)
+      .map(s=> s.line(basic[specKey][s.id].val!==undefined ? basic[specKey][s.id].val : ''))
+      .join('\n');
+    if(onChange) onChange();
+  }
+  wrap.querySelectorAll('[data-opt]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const id = cb.dataset.opt;
+      basic[specKey][id] = basic[specKey][id] || {on:false, val:''};
+      basic[specKey][id].on = cb.checked;
+      const inputEl = wrap.querySelector(`[data-optval="${id}"]`);
+      if(inputEl) inputEl.disabled = !cb.checked;
+      recompute();
+    });
+  });
+  wrap.querySelectorAll('[data-optval]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const id = inp.dataset.optval;
+      basic[specKey][id] = basic[specKey][id] || {on:false, val:''};
+      basic[specKey][id].val = inp.value;
+      recompute();
+    });
+  });
+}
+
+/* ============================================================
+   FOCUS PROPERTIES PANEL
+   ============================================================ */
+function renderFocusProps(){
+  const panel = document.getElementById('focusProps');
+  const sel = state.selection;
+  if(!sel || sel.type!=='focus'){
+    panel.innerHTML = `<div class="empty-state">포커스를 선택하거나<br>캔버스를 더블클릭해 새로 만드세요.</div>`;
+    return;
+  }
+  const f = focusByUid(sel.id);
+  if(!f){ panel.innerHTML=""; return; }
+
+  const prereqGroupsHtml = (f.prereqGroups||[]).length
+    ? f.prereqGroups.map((g,gi)=>{
+        const isOr = g.length>1;
+        const names = g.map(u=>{const o=focusByUid(u); return o? escXml(o.id) : '?';});
+        return `<div class="prereq-group ${isOr?'or':''}">
+          <span class="pg-badge">${isOr?'택1':'필수'}</span>
+          <span class="pg-names">${names.join(isOr?' <em>또는</em> ':' ')}</span>
+          <button data-rm-group="${gi}" title="그룹 삭제">✕</button>
+        </div>`;
+      }).join('')
+    : '<span class="tag-empty">선택된 항목 없음</span>';
+
+  panel.innerHTML = `
+    <div class="id-header">
+      <div>
+        <div class="kind">FOCUS</div>
+        <div class="idtext" id="idPreview">${escXml(f.id)}</div>
+      </div>
+      <button class="btn ghost del" id="btnDupFocus" title="복제">⧉</button>
+      <button class="btn danger" id="btnDelFocus">삭제</button>
+    </div>
+    <div class="form">
+      <div class="form-section">
+        <div class="form-section-title">기본 정보</div>
+        <div class="field"><label>이름</label><input type="text" id="propName" value="${escXml(f.name)}"></div>
+        <div class="field"><label>Focus ID <span class="key">id</span></label><input type="text" id="propId" value="${escXml(f.id)}"></div>
+        <div class="field"><label>설명</label><textarea id="propDesc">${escXml(f.desc)}</textarea></div>
+        <div class="field"><label>아이콘 <span class="key">icon</span></label><input type="text" id="propIcon" value="${escXml(f.icon)}"></div>
+        <div class="field-row">
+          <div class="field"><label>X <span class="key">x</span></label><input type="number" step="0.5" id="propX" value="${f.x}"></div>
+          <div class="field"><label>Y <span class="key">y</span></label><input type="number" id="propY" value="${f.y}"></div>
+          <div class="field"><label>기간(주) <span class="key">cost</span></label><input type="number" id="propCost" value="${f.cost}"><div class="field-note" id="propCostDays">≈ ${(f.cost||0)*7}일</div></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">선행조건 — <span style="color:var(--blue-hi)">━필수</span> / <span style="color:var(--blue-hi)">┄택1(OR)</span></div>
+        <div class="tag-summary" id="prereqSummary">
+          ${prereqGroupsHtml}
+        </div>
+        <button class="btn ghost picker-btn" id="btnOpenPrereq">+ 선행조건 선택</button>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">상호배타 (Mutually Exclusive)</div>
+        <div class="tag-summary" id="mutexSummary">
+          ${(f.mutex||[]).length? f.mutex.map(u=>{const o=focusByUid(u); return o? `<span class="sel-tag mutex">${escXml(o.id)}<button data-rm-mutex="${u}" title="제거">✕</button></span>` : '';}).join('') : '<span class="tag-empty">선택된 항목 없음</span>'}
+        </div>
+        <button class="btn ghost picker-btn" id="btnOpenMutex">+ 상호배타 선택</button>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">트리거 &amp; 이펙트</div>
+        ${modeToggleHtml()}
+        ${editorMode==='advanced' ? `
+        <div class="field"><label>Available <span class="key">available</span></label><textarea id="propAvailable" placeholder="always = yes">${escXml(f.available)}</textarea></div>
+        <div class="field"><label>Bypass <span class="key">bypass</span></label><textarea id="propBypass" placeholder="has_war = no">${escXml(f.bypass)}</textarea></div>
+        <div class="field"><label>Completion Reward <span class="key">completion_reward</span></label><textarea id="propReward">${escXml(f.completionReward)}</textarea></div>
+        <div class="field"><label>Select Effect <span class="key">select_effect</span></label><textarea id="propSelect">${escXml(f.selectEffect)}</textarea></div>
+        <div class="field"><label>AI Will Do <span class="key">ai_will_do</span></label><textarea id="propAi">${escXml(f.aiWillDo)}</textarea></div>
+        ` : `
+        ${basicFieldHtml('Available','available','focusAvailable',f)}
+        ${basicFieldHtml('Bypass','bypass','focusBypass',f)}
+        ${basicFieldHtml('Completion Reward','completion_reward','focusReward',f)}
+        ${basicFieldHtml('Select Effect','select_effect','focusSelect',f)}
+        ${basicFieldHtml('AI Will Do','ai_will_do','focusAi',f)}
+        `}
+      </div>
+    </div>
+  `;
+
+  bindModeToggle(panel, renderFocusProps);
+
+  const bind = (id, key, transform)=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('input', ()=>{
+      f[key] = transform ? transform(el.value) : el.value;
+      if(key==='id') document.getElementById('idPreview').textContent = f.id;
+      if(key==='name' || key==='cost'){ renderFocusList(); renderCanvas(); }
+      if(key==='x'||key==='y'||key==='cost') renderCanvas();
+      if(key==='cost'){
+        const note = document.getElementById('propCostDays');
+        if(note) note.textContent = `≈ ${(f.cost||0)*7}일`;
+      }
+    });
+  };
+  bind('propName','name');
+  bind('propId','id', v=>slug(v)||f.id);
+  bind('propDesc','desc');
+  bind('propIcon','icon');
+  bind('propX','x', v=>parseFloat(v)||0);
+  bind('propY','y', v=>parseInt(v)||0);
+  bind('propCost','cost', v=>parseInt(v)||0);
+  if(editorMode==='advanced'){
+    bind('propAvailable','available');
+    bind('propBypass','bypass');
+    bind('propReward','completionReward');
+    bind('propSelect','selectEffect');
+    bind('propAi','aiWillDo');
+  } else {
+    bindBasicField(panel, 'focusAvailable', f, 'available');
+    bindBasicField(panel, 'focusBypass', f, 'bypass');
+    bindBasicField(panel, 'focusReward', f, 'completionReward');
+    bindBasicField(panel, 'focusSelect', f, 'selectEffect');
+    bindBasicField(panel, 'focusAi', f, 'aiWillDo');
+  }
+
+  panel.querySelectorAll('[data-rm-group]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const gi = parseInt(btn.dataset.rmGroup);
+      f.prereqGroups.splice(gi,1);
+      renderFocusProps();
+      renderCanvas();
+    });
+  });
+  panel.querySelectorAll('[data-rm-mutex]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const u = btn.dataset.rmMutex;
+      f.mutex = (f.mutex||[]).filter(x=>x!==u);
+      renderFocusProps();
+      renderCanvas();
+    });
+  });
+  document.getElementById('btnOpenPrereq').addEventListener('click', ()=> openPicker('prereq'));
+  document.getElementById('btnOpenMutex').addEventListener('click', ()=> openPicker('mutex'));
+
+  document.getElementById('btnDelFocus').onclick = ()=> deleteFocus(f._uid);
+  document.getElementById('btnDupFocus').onclick = ()=> duplicateFocus(f._uid);
+}
+
+/* ============================================================
+   DECISION MAKER
+   ============================================================ */
+function selectDecisionEntity(type, id){
+  state.selection = {type, id};
+  renderDecisionView();
+}
+
+function renderCatTree(){
+  const wrap = document.getElementById('catTree');
+  if(!state.categories.length){
+    wrap.innerHTML = `<div class="empty-state">카테고리가 없습니다.<br>"+ 카테고리"로 시작하세요.</div>`;
+    return;
+  }
+  let html = "";
+  state.categories.forEach(c=>{
+    const decs = decisionsInCat(c._uid);
+    const selC = state.selection && state.selection.type==='category' && state.selection.id===c._uid;
+    html += `<div class="cat-block">
+      <div class="cat-row ${selC?'selected':''}" data-cat="${c._uid}">
+        <span class="chev">▾</span>
+        <span class="cname">${escXml(c.name||c.id)}</span>
+        <span class="ccount ${c.visible?'':'hidden-cat'}">${decs.length}</span>
+        <button class="eye ${c.visible?'':'off'}" data-eye="${c._uid}" title="미리보기/내보내기 표시 여부">${c.visible?'👁':'🚫'}</button>
+      </div>
+      ${decs.map(d=>{
+        const selD = state.selection && state.selection.type==='decision' && state.selection.id===d._uid;
+        return `<div class="row dec-row ${selD?'selected':''}" data-dec="${d._uid}">
+          <div class="swatch">▤</div>
+          <div class="rtext"><div class="rname">${escXml(d.name||d.id)}</div><div class="rid">${escXml(d.id)}</div></div>
+          <div class="rbadge">${d.cost}PP</div>
+          <button class="rdel" data-deldec="${d._uid}">✕</button>
+        </div>`;
+      }).join("")}
+    </div>`;
+  });
+  wrap.innerHTML = html;
+
+  wrap.querySelectorAll('[data-cat]').forEach(row=>{
+    row.addEventListener('click', (e)=>{
+      if(e.target.dataset.eye) return;
+      selectDecisionEntity('category', row.dataset.cat);
+    });
+  });
+  wrap.querySelectorAll('[data-eye]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const c = catByUid(btn.dataset.eye);
+      c.visible = !c.visible;
+      renderCatTree(); renderPreview();
+    });
+  });
+  wrap.querySelectorAll('[data-dec]').forEach(row=>{
+    row.addEventListener('click', (e)=>{
+      if(e.target.dataset.deldec) return;
+      selectDecisionEntity('decision', row.dataset.dec);
+    });
+  });
+  wrap.querySelectorAll('[data-deldec]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{ e.stopPropagation(); deleteDecision(btn.dataset.deldec); });
+  });
+}
+
+function deleteCategory(u){
+  state.categories = state.categories.filter(c=>c._uid!==u);
+  state.decisions = state.decisions.filter(d=>d.categoryUid!==u);
+  if(state.selection && (state.selection.id===u)) state.selection = null;
+  renderDecisionView();
+  toast("카테고리 삭제됨");
+}
+function deleteDecision(u){
+  state.decisions = state.decisions.filter(d=>d._uid!==u);
+  if(state.selection && state.selection.id===u) state.selection = null;
+  renderDecisionView();
+  toast("디시전 삭제됨");
+}
+
+document.getElementById('btnAddCategory').addEventListener('click', ()=>{
+  const c = newCategory();
+  state.categories.push(c);
+  selectDecisionEntity('category', c._uid);
+});
+document.getElementById('btnAddDecision').addEventListener('click', ()=>{
+  if(!state.categories.length){
+    const c = newCategory();
+    state.categories.push(c);
+  }
+  let targetCat = null;
+  if(state.selection && state.selection.type==='category') targetCat = state.selection.id;
+  else if(state.selection && state.selection.type==='decision'){
+    const d = state.decisions.find(x=>x._uid===state.selection.id);
+    targetCat = d ? d.categoryUid : state.categories[0]._uid;
+  } else targetCat = state.categories[0]._uid;
+  const d = newDecision(targetCat);
+  state.decisions.push(d);
+  selectDecisionEntity('decision', d._uid);
+});
+
+function renderDecisionProps(){
+  const panel = document.getElementById('decisionProps');
+  const sel = state.selection;
+  if(!sel || (sel.type!=='category' && sel.type!=='decision')){
+    panel.innerHTML = `<div class="empty-state">카테고리 또는 디시전을<br>선택하거나 새로 만드세요.</div>`;
+    return;
+  }
+  if(sel.type==='category'){
+    const c = catByUid(sel.id);
+    if(!c){ panel.innerHTML=""; return; }
+    panel.innerHTML = `
+      <div class="id-header">
+        <div><div class="kind">CATEGORY</div><div class="idtext" id="idPreview">${escXml(c.id)}</div></div>
+        <button class="btn danger" id="btnDelCat">삭제</button>
+      </div>
+      <div class="form">
+        <div class="form-section">
+          <div class="form-section-title">기본 정보</div>
+          <div class="field"><label>이름</label><input type="text" id="cName" value="${escXml(c.name)}"></div>
+          <div class="field"><label>Category ID <span class="key">cat_id</span></label><input type="text" id="cId" value="${escXml(c.id)}"></div>
+          <div class="field"><label>설명</label><textarea id="cDesc">${escXml(c.desc)}</textarea></div>
+          <div class="field"><label>아이콘 <span class="key">icon</span></label><input type="text" id="cIcon" value="${escXml(c.icon)}"></div>
+          <div class="field"><label>우선순위 <span class="key">priority</span></label><input type="number" id="cPriority" value="${c.priority}"></div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">트리거</div>
+          ${modeToggleHtml()}
+          ${editorMode==='advanced' ? `
+          <div class="field"><label>Allowed <span class="key">allowed</span></label><textarea id="cAllowed" placeholder="always = yes">${escXml(c.allowed)}</textarea></div>
+          <div class="field"><label>Visible <span class="key">visible</span></label><textarea id="cVisible" placeholder="always = yes">${escXml(c.visibleTrigger)}</textarea></div>
+          ` : `
+          ${basicFieldHtml('Allowed','allowed','decAllowed',c)}
+          ${basicFieldHtml('Visible','visible','decVisible',c)}
+          `}
+        </div>
+      </div>`;
+    bindModeToggle(panel, renderDecisionProps);
+    const bind=(id,key,tr)=>{const el=document.getElementById(id); if(!el) return; el.addEventListener('input',()=>{c[key]=tr?tr(el.value):el.value; if(key==='id')document.getElementById('idPreview').textContent=c.id; renderCatTree(); renderPreview();});};
+    bind('cName','name'); bind('cId','id',v=>slug(v)||c.id); bind('cDesc','desc'); bind('cIcon','icon');
+    bind('cPriority','priority',v=>parseInt(v)||0);
+    if(editorMode==='advanced'){
+      bind('cAllowed','allowed'); bind('cVisible','visibleTrigger');
+    } else {
+      bindBasicField(panel, 'decAllowed', c, 'allowed', ()=>{ renderCatTree(); renderPreview(); });
+      bindBasicField(panel, 'decVisible', c, 'visibleTrigger', ()=>{ renderCatTree(); renderPreview(); });
+    }
+    document.getElementById('btnDelCat').onclick = ()=>deleteCategory(c._uid);
+  } else {
+    const d = state.decisions.find(x=>x._uid===sel.id);
+    if(!d){ panel.innerHTML=""; return; }
+    const catOptions = state.categories.map(c=>`<option value="${c._uid}" ${c._uid===d.categoryUid?'selected':''}>${escXml(c.name||c.id)}</option>`).join("");
+    panel.innerHTML = `
+      <div class="id-header">
+        <div><div class="kind">DECISION</div><div class="idtext" id="idPreview">${escXml(d.id)}</div></div>
+        <button class="btn danger" id="btnDelDec">삭제</button>
+      </div>
+      <div class="form">
+        <div class="form-section">
+          <div class="form-section-title">기본 정보</div>
+          <div class="field"><label>이름</label><input type="text" id="dName" value="${escXml(d.name)}"></div>
+          <div class="field"><label>Decision ID <span class="key">dec_id</span></label><input type="text" id="dId" value="${escXml(d.id)}"></div>
+          <div class="field"><label>카테고리</label><select id="dCat">${catOptions}</select></div>
+          <div class="field"><label>설명</label><textarea id="dDesc">${escXml(d.desc)}</textarea></div>
+          <div class="field"><label>아이콘 <span class="key">icon</span></label><input type="text" id="dIcon" value="${escXml(d.icon)}"></div>
+          <div class="field-row">
+            <div class="field"><label>비용(PP) <span class="key">cost</span></label><input type="number" id="dCost" value="${d.cost}"></div>
+            <div class="field"><label>제거일 <span class="key">days_remove</span></label><input type="number" id="dDaysRemove" value="${d.daysRemove}"></div>
+            <div class="field"><label>재활성일 <span class="key">days_re_enable</span></label><input type="number" id="dDaysReEnable" value="${d.daysReEnable}"></div>
+          </div>
+          <div class="checkline"><input type="checkbox" id="dFireOnce" ${d.fireOnlyOnce?'checked':''}><label for="dFireOnce">Fire Only Once <span class="key">fire_only_once</span></label></div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">트리거 &amp; 이펙트</div>
+          ${modeToggleHtml()}
+          ${editorMode==='advanced' ? `
+          <div class="field"><label>Allowed <span class="key">allowed</span></label><textarea id="dAllowed" placeholder="always = yes">${escXml(d.allowed)}</textarea></div>
+          <div class="field"><label>Visible <span class="key">visible</span></label><textarea id="dVisible" placeholder="always = yes">${escXml(d.visible)}</textarea></div>
+          <div class="field"><label>Available <span class="key">available</span></label><textarea id="dAvailable" placeholder="always = yes">${escXml(d.available)}</textarea></div>
+          <div class="field"><label>Complete Effect <span class="key">complete_effect</span></label><textarea id="dComplete">${escXml(d.completeEffect)}</textarea></div>
+          <div class="field"><label>AI Will Do <span class="key">ai_will_do</span></label><textarea id="dAi">${escXml(d.aiWillDo)}</textarea></div>
+          ` : `
+          ${basicFieldHtml('Allowed','allowed','decAllowed',d)}
+          ${basicFieldHtml('Visible','visible','decVisible',d)}
+          ${basicFieldHtml('Available','available','decAvailable',d)}
+          ${basicFieldHtml('Complete Effect','complete_effect','decComplete',d)}
+          ${basicFieldHtml('AI Will Do','ai_will_do','decAi',d)}
+          `}
+        </div>
+      </div>`;
+    bindModeToggle(panel, renderDecisionProps);
+    const bind=(id,key,tr)=>{const el=document.getElementById(id); if(!el) return; el.addEventListener('input',()=>{d[key]=tr?tr(el.value):el.value; if(key==='id')document.getElementById('idPreview').textContent=d.id; renderCatTree(); renderPreview();});};
+    bind('dName','name'); bind('dId','id',v=>slug(v)||d.id); bind('dDesc','desc'); bind('dIcon','icon');
+    bind('dCost','cost',v=>parseInt(v)||0); bind('dDaysRemove','daysRemove',v=>v); bind('dDaysReEnable','daysReEnable',v=>v);
+    if(editorMode==='advanced'){
+      bind('dAllowed','allowed'); bind('dVisible','visible'); bind('dAvailable','available'); bind('dComplete','completeEffect'); bind('dAi','aiWillDo');
+    } else {
+      bindBasicField(panel, 'decAllowed', d, 'allowed');
+      bindBasicField(panel, 'decVisible', d, 'visible');
+      bindBasicField(panel, 'decAvailable', d, 'available');
+      bindBasicField(panel, 'decComplete', d, 'completeEffect');
+      bindBasicField(panel, 'decAi', d, 'aiWillDo');
+    }
+    document.getElementById('dFireOnce').addEventListener('change', (e)=>{ d.fireOnlyOnce = e.target.checked; });
+    document.getElementById('dCat').addEventListener('change', (e)=>{ d.categoryUid = e.target.value; renderCatTree(); renderPreview(); });
+    document.getElementById('btnDelDec').onclick = ()=>deleteDecision(d._uid);
+  }
+}
+
+function renderPreview(){
+  const wrap = document.getElementById('previewBody');
+  const visibleCats = state.categories.filter(c=>c.visible);
+  if(!visibleCats.length){
+    wrap.innerHTML = `<div class="empty-state">표시할 카테고리가 없습니다.<br>👁 버튼으로 표시하세요.</div>`;
+    return;
+  }
+  wrap.innerHTML = visibleCats.map(c=>{
+    const decs = decisionsInCat(c._uid);
+    return `<div class="preview-cat">
+      <div class="preview-cat-head">
+        <div class="preview-cat-name">${escXml(c.name||c.id)}</div>
+        ${c.desc? `<div class="preview-cat-desc">${escXml(c.desc)}</div>`:""}
+      </div>
+      ${decs.length? decs.map(d=>`<div class="preview-dec"><div class="pd-icon"></div><div class="pd-name">${escXml(d.name||d.id)}</div><div class="pd-cost">${d.cost}PP</div></div>`).join("") : `<div class="preview-dec"><div class="pd-name" style="color:var(--ink-low)">디시전 없음</div></div>`}
+    </div>`;
+  }).join("");
+}
+
+function renderDecisionView(){
+  renderCatTree();
+  renderDecisionProps();
+  renderPreview();
+}
+
+/* ============================================================
+   CODE GENERATORS (Paradox script)
+   ============================================================ */
+function genFocusTreeTxt(){
+  const t = state.tag;
+  let out = `focus_tree = {\n`;
+  out += `\tid = ${t}_focus_tree\n`;
+  out += `\tcountry = {\n\t\tfactor = 1\n\t\tmodifier = {\n\t\t\tadd = -1\n\t\t\tNOT = { tag = ${t} }\n\t\t}\n\t}\n`;
+  out += `\tdefault = no\n\n`;
+  state.focuses.forEach(f=>{
+    out += `\tfocus = {\n`;
+    out += `\t\tid = ${f.id}\n`;
+    out += `\t\ticon = ${f.icon||"GFX_goal_generic"}\n`;
+    out += `\t\tx = ${f.x}\n`;
+    out += `\t\ty = ${f.y}\n`;
+    out += `\t\tcost = ${f.cost}\n`;
+    (f.prereqGroups||[]).forEach(group=>{
+      if(!group.length) return;
+      const ids = group.map(u=>{ const o=focusByUid(u); return o?o.id:null; }).filter(Boolean);
+      if(!ids.length) return;
+      out += `\t\tprerequisite = { ${ids.map(id=>`focus = ${id}`).join(" ")} }\n`;
+    });
+    (f.mutex||[]).forEach(u=>{
+      const o = focusByUid(u);
+      if(o) out += `\t\tmutually_exclusive = { focus = ${o.id} }\n`;
+    });
+    if((f.available||"").trim()) out += `\t\tavailable = {\n${indentBlock(f.available,12)}\n\t\t}\n`;
+    if((f.bypass||"").trim()) out += `\t\tbypass = {\n${indentBlock(f.bypass,12)}\n\t\t}\n`;
+    out += `\t\tcompletion_reward = {\n${indentBlock(f.completionReward||"add_political_power = 50",12)}\n\t\t}\n`;
+    if((f.selectEffect||"").trim()) out += `\t\tselect_effect = {\n${indentBlock(f.selectEffect,12)}\n\t\t}\n`;
+    if((f.aiWillDo||"").trim()) out += `\t\tai_will_do = {\n${indentBlock(f.aiWillDo,12)}\n\t\t}\n`;
+    out += `\t}\n\n`;
+  });
+  out += `}\n`;
+  return out;
+}
+
+function genFocusYml(){
+  const t = state.tag;
+  let out = `l_english:\n`;
+  state.focuses.forEach(f=>{
+    out += ` ${f.id}:0 "${ymlEscape(f.name||f.id)}"\n`;
+    if((f.desc||"").trim()) out += ` ${f.id}_desc:0 "${ymlEscape(f.desc)}"\n`;
+  });
+  return out;
+}
+
+function genDecisionsTxt(){
+  let out = `decisions = {\n`;
+  state.decisions.forEach(d=>{
+    const cat = catByUid(d.categoryUid);
+    out += `\t${d.id} = {\n`;
+    out += `\t\ticon = ${d.icon||"GFX_decision_generic"}\n`;
+    out += `\t\tcategory = ${cat? cat.id : state.tag+"_category_1"}\n`;
+    out += `\t\tcost = ${d.cost}\n`;
+    if(d.daysRemove!=="" && d.daysRemove!=null) out += `\t\tdays_remove = ${d.daysRemove}\n`;
+    if(d.daysReEnable!=="" && d.daysReEnable!=null) out += `\t\tdays_re_enable = ${d.daysReEnable}\n`;
+    if(d.fireOnlyOnce) out += `\t\tfire_only_once = yes\n`;
+    out += `\t\tallowed = {\n${indentBlock(d.allowed||"always = yes",12)}\n\t\t}\n`;
+    if((d.visible||"").trim()) out += `\t\tvisible = {\n${indentBlock(d.visible,12)}\n\t\t}\n`;
+    if((d.available||"").trim()) out += `\t\tavailable = {\n${indentBlock(d.available,12)}\n\t\t}\n`;
+    if((d.completeEffect||"").trim()) out += `\t\tcomplete_effect = {\n${indentBlock(d.completeEffect,12)}\n\t\t}\n`;
+    if((d.aiWillDo||"").trim()) out += `\t\tai_will_do = {\n${indentBlock(d.aiWillDo,12)}\n\t\t}\n`;
+    out += `\t}\n`;
+  });
+  out += `}\n`;
+  return out;
+}
+
+function genCategoriesTxt(){
+  let out = "";
+  state.categories.forEach(c=>{
+    out += `${c.id} = {\n`;
+    out += `\ticon = ${c.icon||"GFX_decision_category_generic"}\n`;
+    out += `\tpriority = ${c.priority}\n`;
+    out += `\tallowed = {\n${indentBlock(c.allowed||"always = yes",8)}\n\t}\n`;
+    out += `\tvisible = {\n${indentBlock(c.visibleTrigger||"always = yes",8)}\n\t}\n`;
+    out += `}\n\n`;
+  });
+  return out;
+}
+
+function genDecisionYml(){
+  let out = `l_english:\n`;
+  state.categories.forEach(c=>{
+    out += ` ${c.id}:0 "${ymlEscape(c.name||c.id)}"\n`;
+    if((c.desc||"").trim()) out += ` ${c.id}_desc:0 "${ymlEscape(c.desc)}"\n`;
+  });
+  state.decisions.forEach(d=>{
+    out += ` ${d.id}:0 "${ymlEscape(d.name||d.id)}"\n`;
+    if((d.desc||"").trim()) out += ` ${d.id}_desc:0 "${ymlEscape(d.desc)}"\n`;
+  });
+  return out;
+}
+
+/* ============================================================
+   EXPORT MODAL
+   ============================================================ */
+const modal = document.getElementById('codeModal');
+const codeArea = document.getElementById('codeArea');
+const modalTabs = document.getElementById('modalTabs');
+let currentTabs = [];
+let currentTabIndex = 0;
+
+function openModal(title, tabs){
+  document.getElementById('modalTitle').textContent = title;
+  currentTabs = tabs;
+  currentTabIndex = 0;
+  renderModalTabs();
+  showTab(0);
+  modal.classList.add('open');
+}
+function renderModalTabs(){
+  modalTabs.innerHTML = currentTabs.map((t,i)=>`<button class="modal-tab ${i===currentTabIndex?'active':''}" data-i="${i}">${t.label}</button>`).join("");
+  modalTabs.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>showTab(parseInt(b.dataset.i))));
+}
+function showTab(i){
+  currentTabIndex = i;
+  codeArea.value = currentTabs[i].content;
+  modalTabs.querySelectorAll('button').forEach((b,idx)=>b.classList.toggle('active', idx===i));
+}
+document.getElementById('closeModal').onclick = ()=> modal.classList.remove('open');
+modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.classList.remove('open'); });
+
+document.getElementById('btnCopyCode').addEventListener('click', ()=>{
+  codeArea.select();
+  document.execCommand('copy');
+  toast("클립보드에 복사됨");
+});
+document.getElementById('btnDownloadCode').addEventListener('click', ()=>{
+  const tab = currentTabs[currentTabIndex];
+  const blob = new Blob([tab.content], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = tab.filename;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast(tab.filename + " 다운로드됨");
+});
+
+document.getElementById('btnExportCode').addEventListener('click', ()=>{
+  const onFocusTab = document.getElementById('view-focus').classList.contains('active');
+  if(onFocusTab){
+    openModal("포커스 트리 내보내기", [
+      { label: state.tag+"_focus_tree.txt", content: genFocusTreeTxt(), filename: state.tag+"_focus_tree.txt" },
+      { label: state.tag+"_focus_l_english.yml", content: genFocusYml(), filename: state.tag+"_focus_l_english.yml" },
+    ]);
+  } else {
+    openModal("디시전 내보내기", [
+      { label: state.tag+"_decisions.txt", content: genDecisionsTxt(), filename: state.tag+"_decisions.txt" },
+      { label: state.tag+"_categories.txt", content: genCategoriesTxt(), filename: state.tag+"_categories.txt" },
+      { label: state.tag+"_decisions_l_english.yml", content: genDecisionYml(), filename: state.tag+"_decisions_l_english.yml" },
+    ]);
+  }
+});
+
+/* ============================================================
+   PROJECT SAVE / LOAD (json)
+   ============================================================ */
+document.getElementById('btnExportProject').addEventListener('click', ()=>{
+  const data = JSON.stringify({tag:state.tag, focuses:state.focuses, categories:state.categories, decisions:state.decisions}, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = (state.tag||"project") + "_ttr_project.json";
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("프로젝트 저장됨");
+});
+document.getElementById('btnImportProject').addEventListener('click', ()=>{
+  document.getElementById('fileImport').click();
+});
+document.getElementById('fileImport').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      state.tag = data.tag || "TAG";
+      state.focuses = data.focuses || [];
+      state.categories = data.categories || [];
+      state.decisions = data.decisions || [];
+      state.selection = null;
+      tagInput.value = state.tag;
+      document.getElementById('cornerTag').textContent = state.tag;
+      renderFocusList(); renderFocusProps(); renderCanvas();
+      renderDecisionView();
+      toast("프로젝트 불러오기 완료");
+    }catch(err){
+      toast("불러오기 실패: 올바른 JSON 파일이 아닙니다");
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = "";
+});
+
+/* ============================================================
+   SEED EXAMPLE DATA
+   ============================================================ */
+function seed(){
+  const f1 = newFocus(0,0); f1.id="TAG_start_focus"; f1.name="새로운 시작"; f1.cost=5;
+  const f2 = newFocus(-1,1); f2.id="TAG_industry_focus"; f2.name="산업 확장"; f2.cost=10;
+  f2.prereqGroups=[[f1._uid]];
+  f2.completionReward = "add_ideas = { TAG_industrial_boost }";
+  f2._basic.focusReward = { idea: { on:true, val:'TAG_industrial_boost' } };
+  const f3 = newFocus(1,1); f3.id="TAG_military_focus"; f3.name="군비 증강"; f3.cost=10;
+  f3.prereqGroups=[[f1._uid]];
+  f3.mutex=[f2._uid];
+  f3.completionReward = "army_experience = 30";
+  f3._basic.focusReward = { armyXp: { on:true, val:'30' } };
+  const f4 = newFocus(0,2); f4.id="TAG_effort_focus"; f4.name="총력전 준비"; f4.cost=10;
+  f4.prereqGroups=[[f2._uid,f3._uid]]; // OR: either industry or military unlocks this
+  state.focuses.push(f1,f2,f3,f4);
+
+  const c1 = newCategory(); c1.id="TAG_political_category"; c1.name="정치"; c1.icon="GFX_decision_category_political";
+  c1.allowed = "always = yes";
+  c1._basic.decAllowed = { alwaysYes: { on:true, val:'' } };
+  state.categories.push(c1);
+  const d1 = newDecision(c1._uid); d1.id="TAG_propaganda_decision"; d1.name="선전 캠페인"; d1.cost=50; d1.desc="국민의 사기를 진작시킵니다.";
+  d1.completeEffect = "add_stability = 0.05";
+  d1._basic.decComplete = { stability: { on:true, val:'0.05' } };
+  state.decisions.push(d1);
+
+  state.tag = "TAG";
+}
+seed();
+
+/* initial render */
+renderFocusList();
+renderFocusProps();
+renderCanvas();
+renderDecisionView();
+
+})();
+</script>
+</body>
+</html>
