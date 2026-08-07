@@ -6,8 +6,9 @@
       --tno-neon-dim: rgba(183, 77, 255, .3);
       --tno-text: #efe0ff;
       --tno-border: #4a2a7a;
-      --tno-gold: #ffb84d;
-      --vote-yea: #7c9bff;
+      --tno-gold: #ff9a4d;
+      --vote-yea: #b968ff;
+      --tno-future: #ff3ec4;
       --rd-gap: clamp(10px, 1.25vw, 18px);
       --edge-pad: clamp(14px, 1.8vw, 26px);
     }
@@ -197,7 +198,7 @@
       line-height: 1;
       letter-spacing: 3px;
       text-align: left;
-      text-shadow: 0 0 10px rgba(255,184,77,.5);
+      text-shadow: 0 0 10px rgba(255,154,77,.5);
       flex: 0 0 auto;
     }
 
@@ -264,7 +265,7 @@
 
     .rd-card.done {
       --card-color: var(--vote-yea);
-      --card-bg-hover: #0d1a14;
+      --card-bg-hover: #180d24;
     }
 
     .rd-card.current {
@@ -273,8 +274,8 @@
     }
 
     .rd-card.future {
-      --card-color: var(--tno-neon);
-      --card-bg-hover: #150d24;
+      --card-color: var(--tno-future);
+      --card-bg-hover: #24101c;
     }
 
     .rd-card:hover {
